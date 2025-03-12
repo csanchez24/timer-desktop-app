@@ -1,5 +1,8 @@
 import { NavLink } from 'react-router';
 import { format } from 'date-fns';
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
 
 export default function Tasks() {
   const tasks = [
@@ -371,12 +374,40 @@ export default function Tasks() {
     },
   ];
 
+  const [searchText, setSearchText] = useState<string | undefined>('');
+  const onSearch = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(event.target.value);
+  }, []);
+
+  const filterTasks = useMemo(() => {
+    if (!searchText) return tasks;
+    return tasks.filter(
+      (task) =>
+        task.marca.includes(searchText) ||
+        task.documento.includes(searchText) ||
+        task.soporte.includes(searchText)
+    );
+  }, [searchText]);
+
   return (
     <div className="container">
       <h1 className="mb-4 text-lg">Tasks</h1>
       <div>
+        <div className="mb-4">
+          <form>
+            <div className="relative">
+              <Search className="text-muted-foreground absolute top-2.5 left-2 h-4 w-4" />
+              <Input
+                placeholder="Filtrar"
+                className="pl-8"
+                value={searchText}
+                onChange={onSearch}
+              />
+            </div>
+          </form>
+        </div>
         <div className="flex flex-col gap-3">
-          {tasks.map((task) => (
+          {filterTasks.map((task) => (
             <NavLink
               to={`/tasks/${task.marca}-${task.documento}`}
               className="block rounded-xl border p-4 shadow"

@@ -8,5 +8,5 @@ export type Mesa13 = {
   hora: string; // CHAR(8) (HH:MM:SS)
   tiempo: string; // CHAR(8) (HH:MM:SS)
   nota: string; // TEXT
-  soporte?: string | null; // CHAR(1) (nullable)
+  soporte?: string; // CHAR(1) (nullable)
 };
