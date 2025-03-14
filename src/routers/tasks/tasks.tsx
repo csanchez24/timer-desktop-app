@@ -3,376 +3,11 @@ import { format } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
+import { useTasks } from '@/hooks/tasks';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Tasks() {
-  const tasks = [
-    {
-      marca: 'AB',
-      documento: '1234567',
-      fecha: '2025-03-10',
-      hora: '14:35:20',
-      usuario: 10234,
-      codare: 'XZ',
-      codpro: 56789,
-      usuare: 20345,
-      codmod: 'M1',
-      accsol: 'A2',
-      nivimp: 'H',
-      horext: 'S',
-      url: 'https://example.com/file.pdf',
-      nomarc: 'document.pdf',
-      garantia: 'N',
-      estado: 'A',
-      fecest: '2025-03-10',
-      usures: 30456,
-      accgen: 'B12',
-      tiempo: '00:45',
-      presu: '012345',
-      soporte: 'Y',
-      testin: 'Initial system test completed successfully.',
-      mesa08: [
-        {
-          id: 1,
-          descripcion: 'Mesa08 test entry',
-        },
-      ],
-      mesa13: [
-        {
-          id: 2,
-          detalle: 'Mesa13 test entry',
-        },
-      ],
-    },
-    {
-      marca: 'CD',
-      documento: '7654321',
-      fecha: '2025-03-09',
-      hora: '08:15:45',
-      usuario: 20987,
-      codare: 'YZ',
-      codpro: 67890,
-      usuare: 11223,
-      codmod: 'M2',
-      accsol: 'B3',
-      nivimp: 'M',
-      horext: 'N',
-      url: null,
-      nomarc: null,
-      garantia: 'S',
-      estado: 'P',
-      fecest: '2025-03-09',
-      usures: null,
-      accgen: 'C34',
-      tiempo: '01:15',
-      presu: '067890',
-      soporte: 'N',
-      testin: 'Pending validation from QA team.',
-      mesa08: [],
-      mesa13: [],
-    },
-    {
-      marca: 'CD',
-      documento: '7654321',
-      fecha: '2025-03-09',
-      hora: '08:15:45',
-      usuario: 20987,
-      codare: 'YZ',
-      codpro: 67890,
-      usuare: 11223,
-      codmod: 'M2',
-      accsol: 'B3',
-      nivimp: 'M',
-      horext: 'N',
-      url: null,
-      nomarc: null,
-      garantia: 'S',
-      estado: 'P',
-      fecest: '2025-03-09',
-      usures: null,
-      accgen: 'C34',
-      tiempo: '01:15',
-      presu: '067890',
-      soporte: 'N',
-      testin: 'Pending validation from QA team.',
-      mesa08: [],
-      mesa13: [],
-    },
-    {
-      marca: 'CD',
-      documento: '7654321',
-      fecha: '2025-03-09',
-      hora: '08:15:45',
-      usuario: 20987,
-      codare: 'YZ',
-      codpro: 67890,
-      usuare: 11223,
-      codmod: 'M2',
-      accsol: 'B3',
-      nivimp: 'M',
-      horext: 'N',
-      url: null,
-      nomarc: null,
-      garantia: 'S',
-      estado: 'P',
-      fecest: '2025-03-09',
-      usures: null,
-      accgen: 'C34',
-      tiempo: '01:15',
-      presu: '067890',
-      soporte: 'N',
-      testin: 'Pending validation from QA team.',
-      mesa08: [],
-      mesa13: [],
-    },
-    {
-      marca: 'CD',
-      documento: '7654321',
-      fecha: '2025-03-09',
-      hora: '08:15:45',
-      usuario: 20987,
-      codare: 'YZ',
-      codpro: 67890,
-      usuare: 11223,
-      codmod: 'M2',
-      accsol: 'B3',
-      nivimp: 'M',
-      horext: 'N',
-      url: null,
-      nomarc: null,
-      garantia: 'S',
-      estado: 'P',
-      fecest: '2025-03-09',
-      usures: null,
-      accgen: 'C34',
-      tiempo: '01:15',
-      presu: '067890',
-      soporte: 'N',
-      testin: 'Pending validation from QA team.',
-      mesa08: [],
-      mesa13: [],
-    },
-    {
-      marca: 'CD',
-      documento: '7654321',
-      fecha: '2025-03-09',
-      hora: '08:15:45',
-      usuario: 20987,
-      codare: 'YZ',
-      codpro: 67890,
-      usuare: 11223,
-      codmod: 'M2',
-      accsol: 'B3',
-      nivimp: 'M',
-      horext: 'N',
-      url: null,
-      nomarc: null,
-      garantia: 'S',
-      estado: 'P',
-      fecest: '2025-03-09',
-      usures: null,
-      accgen: 'C34',
-      tiempo: '01:15',
-      presu: '067890',
-      soporte: 'N',
-      testin: 'Pending validation from QA team.',
-      mesa08: [],
-      mesa13: [],
-    },
-    {
-      marca: 'CD',
-      documento: '7654321',
-      fecha: '2025-03-09',
-      hora: '08:15:45',
-      usuario: 20987,
-      codare: 'YZ',
-      codpro: 67890,
-      usuare: 11223,
-      codmod: 'M2',
-      accsol: 'B3',
-      nivimp: 'M',
-      horext: 'N',
-      url: null,
-      nomarc: null,
-      garantia: 'S',
-      estado: 'P',
-      fecest: '2025-03-09',
-      usures: null,
-      accgen: 'C34',
-      tiempo: '01:15',
-      presu: '067890',
-      soporte: 'N',
-      testin: 'Pending validation from QA team.',
-      mesa08: [],
-      mesa13: [],
-    },
-    {
-      marca: 'CD',
-      documento: '7654321',
-      fecha: '2025-03-09',
-      hora: '08:15:45',
-      usuario: 20987,
-      codare: 'YZ',
-      codpro: 67890,
-      usuare: 11223,
-      codmod: 'M2',
-      accsol: 'B3',
-      nivimp: 'M',
-      horext: 'N',
-      url: null,
-      nomarc: null,
-      garantia: 'S',
-      estado: 'P',
-      fecest: '2025-03-09',
-      usures: null,
-      accgen: 'C34',
-      tiempo: '01:15',
-      presu: '067890',
-      soporte: 'N',
-      testin: 'Pending validation from QA team.',
-      mesa08: [],
-      mesa13: [],
-    },
-    {
-      marca: 'CD',
-      documento: '7654321',
-      fecha: '2025-03-09',
-      hora: '08:15:45',
-      usuario: 20987,
-      codare: 'YZ',
-      codpro: 67890,
-      usuare: 11223,
-      codmod: 'M2',
-      accsol: 'B3',
-      nivimp: 'M',
-      horext: 'N',
-      url: null,
-      nomarc: null,
-      garantia: 'S',
-      estado: 'P',
-      fecest: '2025-03-09',
-      usures: null,
-      accgen: 'C34',
-      tiempo: '01:15',
-      presu: '067890',
-      soporte: 'N',
-      testin: 'Pending validation from QA team.',
-      mesa08: [],
-      mesa13: [],
-    },
-    {
-      marca: 'CD',
-      documento: '7654321',
-      fecha: '2025-03-09',
-      hora: '08:15:45',
-      usuario: 20987,
-      codare: 'YZ',
-      codpro: 67890,
-      usuare: 11223,
-      codmod: 'M2',
-      accsol: 'B3',
-      nivimp: 'M',
-      horext: 'N',
-      url: null,
-      nomarc: null,
-      garantia: 'S',
-      estado: 'P',
-      fecest: '2025-03-09',
-      usures: null,
-      accgen: 'C34',
-      tiempo: '01:15',
-      presu: '067890',
-      soporte: 'N',
-      testin: 'Pending validation from QA team.',
-      mesa08: [],
-      mesa13: [],
-    },
-    {
-      marca: 'CD',
-      documento: '7654321',
-      fecha: '2025-03-09',
-      hora: '08:15:45',
-      usuario: 20987,
-      codare: 'YZ',
-      codpro: 67890,
-      usuare: 11223,
-      codmod: 'M2',
-      accsol: 'B3',
-      nivimp: 'M',
-      horext: 'N',
-      url: null,
-      nomarc: null,
-      garantia: 'S',
-      estado: 'P',
-      fecest: '2025-03-09',
-      usures: null,
-      accgen: 'C34',
-      tiempo: '01:15',
-      presu: '067890',
-      soporte: 'N',
-      testin: 'Pending validation from QA team.',
-      mesa08: [],
-      mesa13: [],
-    },
-    {
-      marca: 'CD',
-      documento: '7654321',
-      fecha: '2025-03-09',
-      hora: '08:15:45',
-      usuario: 20987,
-      codare: 'YZ',
-      codpro: 67890,
-      usuare: 11223,
-      codmod: 'M2',
-      accsol: 'B3',
-      nivimp: 'M',
-      horext: 'N',
-      url: null,
-      nomarc: null,
-      garantia: 'S',
-      estado: 'P',
-      fecest: '2025-03-09',
-      usures: null,
-      accgen: 'C34',
-      tiempo: '01:15',
-      presu: '067890',
-      soporte: 'N',
-      testin: 'Pending validation from QA team.',
-      mesa08: [],
-      mesa13: [],
-    },
-    {
-      marca: 'EF',
-      documento: '9876543',
-      fecha: '2025-03-08',
-      hora: '18:50:10',
-      usuario: 30567,
-      codare: 'WX',
-      codpro: 34567,
-      usuare: 90876,
-      codmod: 'M3',
-      accsol: 'C1',
-      nivimp: 'L',
-      horext: 'S',
-      url: 'https://example.com/report.pdf',
-      nomarc: 'report.pdf',
-      garantia: 'N',
-      estado: 'C',
-      fecest: '2025-03-08',
-      usures: 45678,
-      accgen: null,
-      tiempo: null,
-      presu: null,
-      soporte: 'Y',
-      testin: 'Report generated and reviewed.',
-      mesa08: [
-        {
-          id: 3,
-          descripcion: 'Mesa08 secondary test entry',
-        },
-      ],
-      mesa13: [],
-    },
-  ];
+  const { data: tasks, isLoading } = useTasks();
 
   const [searchText, setSearchText] = useState<string | undefined>('');
   const onSearch = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -380,14 +15,14 @@ export default function Tasks() {
   }, []);
 
   const filterTasks = useMemo(() => {
-    if (!searchText) return tasks;
-    return tasks.filter(
+    if (!searchText) return tasks?.data.casusu;
+    return tasks?.data.casusu.filter(
       (task) =>
-        task.marca.includes(searchText) ||
-        task.documento.includes(searchText) ||
-        task.soporte.includes(searchText)
+        task.marca.toLowerCase().includes(searchText.toLowerCase()) ||
+        task.documento.toLowerCase().includes(searchText.toLowerCase()) ||
+        task.descripcion.toLowerCase().includes(searchText.toLowerCase())
     );
-  }, [searchText]);
+  }, [tasks, searchText]);
 
   return (
     <div className="container">
@@ -407,19 +42,30 @@ export default function Tasks() {
           </form>
         </div>
         <div className="flex flex-col gap-3">
-          {filterTasks.map((task) => (
+          {isLoading && (
+            <div className="flex flex-col gap-3">
+              <Skeleton className="h-24 w-full rounded-xl" />
+              <Skeleton className="h-24 w-full rounded-xl" />
+              <Skeleton className="h-24 w-full rounded-xl" />
+              <Skeleton className="h-24 w-full rounded-xl" />
+              <Skeleton className="h-24 w-full rounded-xl" />
+            </div>
+          )}
+          {filterTasks?.map((task) => (
             <NavLink
-              to={`/tasks/${task.marca}-${task.documento}`}
+              to={`/tasks/${task.marca}/${task.documento}`}
               className="block rounded-xl border p-4 shadow"
+              key={`task-${task.marca}-${task.documento}`}
             >
               <div className="flex justify-between">
-                <div className="text-sm">{task.usuario}</div>
+                <div className="text-sm">{task.usuario_mesa}</div>
                 <div className="text-secondary text-sm font-bold">
                   {task.marca} - {task.documento}
                 </div>
               </div>
-              <div className="text-sm">{task.soporte}</div>
-              <div className="text-sm">{format(task.fecha, 'yyyy-MM-dd')}</div>
+              <div className="text-sm">{task.codigo_area}</div>
+              <div className="text-sm">{task.descripcion}</div>
+              <div className="text-sm">{format(task.fecha_creacion, 'yyyy-MM-dd')}</div>
             </NavLink>
           ))}
         </div>

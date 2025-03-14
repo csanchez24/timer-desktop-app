@@ -21,7 +21,7 @@ pub fn run() {
         },
         Migration {
             version: 2,
-            description: "Create dayli table",
+            description: "Create daily table",
             sql: r#"
             CREATE TABLE IF NOT EXISTS daily (
                 numero INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,6 +35,7 @@ pub fn run() {
                 nota TEXT NOT NULL,
                 esttra TEXT
                 tiempo TEXT
+                padre_id INTEGER
             );
         "#,
             kind: MigrationKind::Up,
@@ -43,6 +44,7 @@ pub fn run() {
 
     // Initialize and configure Tauri
     tauri::Builder::default()
+        .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_opener::init()) // Register file opener plugin
         .plugin(
             SqlBuilder::default()
