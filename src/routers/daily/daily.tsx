@@ -1,61 +1,96 @@
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { db } from '@/db';
+import { DailyTask } from '@/schemas/daily-task';
 import { Play } from 'lucide-react';
-
-const mesa26Data = [
-  {
-    numero: 1,
-    fecha: '2025-03-11',
-    marca: 'AB',
-    documento: '1234567',
-    estado: 'A',
-    estnue: 'S',
-    horini: '08:00',
-    horfin: '12:00',
-    nota: 'Meeting with client.',
-    esttra: 'A',
-    tiempo: '04:00',
-  },
-  {
-    numero: 2,
-    fecha: '2025-03-12',
-    marca: 'XY',
-    documento: '7654321',
-    estado: 'S',
-    estnue: 'A',
-    horini: '09:00',
-    horfin: null,
-    nota: 'Product discussion.',
-    esttra: 'S',
-    tiempo: null,
-  },
-  {
-    numero: 3,
-    fecha: '2025-03-13',
-    marca: 'CD',
-    documento: '9876543',
-    estado: 'A',
-    estnue: 'A',
-    horini: '10:00',
-    horfin: '14:00',
-    nota: 'Team meeting and planning.',
-    esttra: 'A',
-    tiempo: '04:00',
-  },
-];
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 
 export default function Daily() {
+  const [data, setData] = useState<DailyTask[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = (await db.select('SELECT * FROM daily')) as DailyTask[];
+        setData(res);
+      } catch (err) {
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const goToFinishPage = useCallback(async () => {
+    //await db.execute('UPDATE daily set horfin where horfin is null');
+    navigate('/finish');
+  }, []);
+
   return (
     <div className="container">
-      <h1 className="mb-4 text-lg">Tareas Activas</h1>
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-lg">Tareas Activas</h1>
+        </div>
+        <div>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button>Finalizar Dia</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Esta seguro?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Esta accion finalizara los tiempos y lo llevara a finalizar el dia.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    goToFinishPage();
+                  }}
+                >
+                  Finalizar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </div>
+      {isLoading && (
+        <div className="flex flex-col gap-3">
+          <Skeleton className="h-24 w-full rounded-xl" />
+          <Skeleton className="h-24 w-full rounded-xl" />
+          <Skeleton className="h-24 w-full rounded-xl" />
+          <Skeleton className="h-24 w-full rounded-xl" />
+          <Skeleton className="h-24 w-full rounded-xl" />
+        </div>
+      )}
       <div className="flex flex-col gap-3">
-        {mesa26Data.map((mesa26) => (
+        {data?.map((daily) => (
           <div className="block rounded-xl border p-4 shadow">
             <div className="flex justify-between">
               <div className="text-sm">
                 <p>
-                  {mesa26.marca} - {mesa26.documento}
+                  {daily.marca} - {daily.documento}
                 </p>
-                <p>{mesa26.nota}</p>
+                <p>{daily.nota}</p>
               </div>
               <div className="text-secondary text-sm font-bold">
                 <Button variant="ghost">

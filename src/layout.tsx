@@ -23,14 +23,6 @@ export default function Layout() {
             <NotebookPen className="" />
           </NavLink>
           <NavLink
-            to="/finish"
-            className={({ isActive }) =>
-              'flex w-full items-center justify-center p-3 ' + (!isActive ? '' : 'text-blue-500')
-            }
-          >
-            <CalendarCheck className="" />
-          </NavLink>
-          <NavLink
             to="/settings"
             className={({ isActive }) =>
               'flex w-full items-center justify-center p-3 ' + (!isActive ? '' : 'text-blue-500')

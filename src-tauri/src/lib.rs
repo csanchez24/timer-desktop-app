@@ -33,9 +33,8 @@ pub fn run() {
                 horini TEXT NOT NULL,
                 horfin TEXT,
                 nota TEXT NOT NULL,
-                esttra TEXT
-                tiempo TEXT
-                padre_id INTEGER
+                tiempo TEXT,
+                cerrar TEXT NOT NULL
             );
         "#,
             kind: MigrationKind::Up,

@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Mesa02 } from '@/schemas/mesa02';
 
 const formSchema = z.object({
   codsus: z.string(),
@@ -29,7 +30,7 @@ const formSchema = z.object({
   }),
 });
 
-export function SuspenceForm() {
+export function SuspenceForm({ task }: { task?: Mesa02 }) {
   const { data: suspensions } = useSuspensions();
 
   const form = useForm<z.infer<typeof formSchema>>({

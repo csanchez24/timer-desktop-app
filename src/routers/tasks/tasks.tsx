@@ -5,9 +5,30 @@ import { Search } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { useTasks } from '@/hooks/tasks';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
+import { TaskForm } from '../task/task-form';
+import { Mesa02 } from '@/schemas/mesa02';
+import { Icons } from '@/components/icons';
+import { SuspenceForm } from '../task/suspence-form';
 
 export default function Tasks() {
   const { data: tasks, isLoading } = useTasks();
+
+  const [mesa02, setMesa02] = useState<Mesa02>();
+  const [openStartTaskDialog, setStartTaskDialog] = useState(false);
+  const [openSuspenceTaskDialog, setSuspenceTaskDialog] = useState(false);
 
   const [searchText, setSearchText] = useState<string | undefined>('');
   const onSearch = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,7 +47,14 @@ export default function Tasks() {
 
   return (
     <div className="container">
-      <h1 className="mb-4 text-lg">Tasks</h1>
+      <div className="flex justify-between">
+        <div>
+          <h1 className="mb-4 text-lg">Tasks</h1>
+        </div>
+        <div>
+          <p className="">Total casos: {tasks?.data?.casusu?.length ?? 0}</p>
+        </div>
+      </div>
       <div>
         <div className="mb-4">
           <form>
@@ -41,16 +69,20 @@ export default function Tasks() {
             </div>
           </form>
         </div>
+        {isLoading && (
+          <div className="flex flex-col gap-3">
+            <Skeleton className="h-24 w-full rounded-xl" />
+            <Skeleton className="h-24 w-full rounded-xl" />
+            <Skeleton className="h-24 w-full rounded-xl" />
+            <Skeleton className="h-24 w-full rounded-xl" />
+            <Skeleton className="h-24 w-full rounded-xl" />
+          </div>
+        )}
+        {!isLoading && filterTasks?.length === 0 && (
+          <p className="fond-bold text-xl">No hay Casos pendientes</p>
+        )}
+
         <div className="flex flex-col gap-3">
-          {isLoading && (
-            <div className="flex flex-col gap-3">
-              <Skeleton className="h-24 w-full rounded-xl" />
-              <Skeleton className="h-24 w-full rounded-xl" />
-              <Skeleton className="h-24 w-full rounded-xl" />
-              <Skeleton className="h-24 w-full rounded-xl" />
-              <Skeleton className="h-24 w-full rounded-xl" />
-            </div>
-          )}
           {filterTasks?.map((task) => (
             <NavLink
               to={`/tasks/${task.marca}/${task.documento}`}
@@ -58,18 +90,79 @@ export default function Tasks() {
               key={`task-${task.marca}-${task.documento}`}
             >
               <div className="flex justify-between">
-                <div className="text-sm">{task.usuario_mesa}</div>
-                <div className="text-secondary text-sm font-bold">
-                  {task.marca} - {task.documento}
+                <div>
+                  <p className="text-sm">{task.usuario_mesa}</p>
+                  <p className="text-sm">{task.codigo_area}</p>
+                  <p className="text-sm">{task.descripcion}</p>
+                  <p className="text-sm">{format(task.fecha_creacion, 'yyyy-MM-dd')}</p>
+                </div>
+                <div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="border-none">
+                      <Icons.EllipsisVertical />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          setMesa02(task);
+                          setStartTaskDialog(true);
+                        }}
+                      >
+                        Iniciar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          setMesa02(task);
+                          setSuspenceTaskDialog(true);
+                        }}
+                      >
+                        Suspender
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
-              <div className="text-sm">{task.codigo_area}</div>
-              <div className="text-sm">{task.descripcion}</div>
-              <div className="text-sm">{format(task.fecha_creacion, 'yyyy-MM-dd')}</div>
             </NavLink>
           ))}
         </div>
       </div>
+      <Sheet
+        open={openStartTaskDialog}
+        onOpenChange={(open) => {
+          setMesa02(undefined);
+          setStartTaskDialog(open);
+        }}
+      >
+        <SheetContent className="">
+          <SheetHeader>
+            <SheetTitle>Arrancar la tarea</SheetTitle>
+            <SheetDescription>Esta accion iniciar la tarea y su tiempo</SheetDescription>
+          </SheetHeader>
+          <div className="p-4">
+            <TaskForm task={mesa02} />
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <Sheet
+        open={openSuspenceTaskDialog}
+        onOpenChange={(open) => {
+          setMesa02(undefined);
+          setSuspenceTaskDialog(open);
+        }}
+      >
+        <SheetContent className="">
+          <SheetHeader>
+            <SheetTitle>Suspender la tarea</SheetTitle>
+            <SheetDescription>Esta accion suspendera la tarea</SheetDescription>
+          </SheetHeader>
+          <div className="p-4">
+            <SuspenceForm task={mesa02} />
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

@@ -89,7 +89,7 @@ export default function Task() {
                 <SheetDescription>Esta accion iniciar la tarea y su tiempo</SheetDescription>
               </SheetHeader>
               <div className="p-4">
-                <TaskForm />
+                <TaskForm task={task?.data?.mesa02} />
               </div>
             </SheetContent>
           </Sheet>

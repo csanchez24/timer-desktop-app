@@ -1,79 +1,101 @@
-import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-
-const mesa26Data = [
-  {
-    numero: 1,
-    fecha: '2025-03-11',
-    marca: 'AB',
-    documento: '1234567',
-    estado: 'A',
-    estnue: 'S',
-    horini: '08:00',
-    horfin: '12:00',
-    nota: 'Meeting with client.',
-    esttra: 'A',
-    tiempo: '04:00',
-  },
-  {
-    numero: 2,
-    fecha: '2025-03-12',
-    marca: 'XY',
-    documento: '7654321',
-    estado: 'S',
-    estnue: 'A',
-    horini: '09:00',
-    horfin: null,
-    nota: 'Product discussion.',
-    esttra: 'S',
-    tiempo: null,
-  },
-  {
-    numero: 3,
-    fecha: '2025-03-13',
-    marca: 'CD',
-    documento: '9876543',
-    estado: 'A',
-    estnue: 'A',
-    horini: '10:00',
-    horfin: '14:00',
-    nota: 'Team meeting and planning.',
-    esttra: 'A',
-    tiempo: '04:00',
-  },
-];
+import { Skeleton } from '@/components/ui/skeleton';
+import { db } from '@/db';
+import { DailyTask } from '@/schemas/daily-task';
+import { useEffect, useMemo, useState } from 'react';
+import { FinishForm } from './finish-form';
+import { Switch } from '@/components/ui/switch';
 
 export default function Finish() {
+  const [data, setData] = useState<DailyTask[]>([]);
+  const [refecth, setRefecth] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = (await db.select('SELECT * FROM daily')) as DailyTask[];
+        setData(res);
+        setRefecth(false);
+      } catch (err) {
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [refecth]);
+
+  const startTime = useMemo(() => {
+    if (!data) return;
+    return data.at(0)?.horini;
+  }, [data]);
+
+  const endTime = useMemo(() => {
+    if (!data) return;
+    return data.at(0)?.horfin;
+  }, [data]);
+
+  const time = useMemo(() => {
+    if (!data) return;
+    const total = data?.reduce((pre, acc) => pre + parseInt(acc.tiempo ?? '0'), 0);
+
+    const hrs = String(Math.floor(total / 3600)).padStart(2, '0');
+    const mins = String(Math.floor((total % 3600) / 60)).padStart(2, '0');
+    const secs = String(total % 60).padStart(2, '0');
+
+    return `${hrs}:${mins}:${secs}`;
+  }, [data]);
+
+  const markedChecked = async (checked: boolean, numero: number) => {
+    await db.execute('UPDATE daily SET cerrar = ? WHERE numero = ?', [checked ? 'S' : 'N', numero]);
+    setRefecth(true);
+    return;
+  };
+
   return (
     <div className="container">
       <h1 className="mb-4 text-lg">Finish</h1>
+      {isLoading && (
+        <div className="flex flex-col gap-3">
+          <Skeleton className="h-24 w-full rounded-xl" />
+          <Skeleton className="h-24 w-full rounded-xl" />
+          <Skeleton className="h-24 w-full rounded-xl" />
+          <Skeleton className="h-24 w-full rounded-xl" />
+          <Skeleton className="h-24 w-full rounded-xl" />
+        </div>
+      )}
       <div className="mb-4 flex flex-col gap-2">
-        {mesa26Data.map((mesa26) => (
+        {data.map((daily) => (
           <div className="block rounded-xl border p-3 shadow">
             <div className="flex items-center justify-between">
               <div className="text-sm">
-                <p>
-                  {mesa26.marca} - {mesa26.documento}
+                <p className="mb-1">
+                  {daily.marca} - {daily.documento}
                 </p>
-                <p>{mesa26.nota}</p>
+                <p className="mb-2">{daily.nota}</p>
+                <div className="flex items-center space-x-2">
+                  <Switch onCheckedChange={(checked) => markedChecked(checked, daily.numero)} />
+                  <Label>Cerrar Caso</Label>
+                </div>
               </div>
-              <div className="text-primary text-lg font-bold">{mesa26.tiempo}</div>
+              <div className="text-primary text-lg font-bold">{daily.tiempo}</div>
             </div>
           </div>
         ))}
       </div>
       <div className="mb-4 flex justify-between gap-2">
-        <p>Hora Inicial: 08:00</p>
-        <p>Hora Final: 08:00</p>
-        <p>Tiempo: 08:00</p>
+        <p>Hora Inicial: {startTime}</p>
+        <p>Hora Final: {endTime}</p>
+        <p>Tiempo: {time}</p>
       </div>
       <div>
-        <Label className="mb-1">Note</Label>
-        <Textarea className="mb-4" />
-        <div className="text-right">
-          <Button>Finalizar Dia</Button>
-        </div>
+        <FinishForm
+          tasks={data ?? []}
+          horini={startTime ?? ''}
+          horfin={endTime ?? ''}
+          tiempo={time ?? ''}
+        />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-export type Mesa26 = {
+export type DailyTask = {
   numero: number;
   fecha: string; // DATE format, could be "YYYY-MM-DD"
   marca: string; // CHAR(2), UTF-8 encoded
