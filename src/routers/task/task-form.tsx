@@ -19,6 +19,9 @@ import { Mesa02 } from '@/schemas/mesa02';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
+import { getDate } from '@/utils/get-date';
+import { getTime } from '@/utils/get-time';
+import { useTimer } from '@/components/timer-context';
 
 const formSchema = z.object({
   nota: z.string().min(2, {
@@ -28,6 +31,7 @@ const formSchema = z.object({
 
 export function TaskForm({ task }: { task?: Mesa02 }) {
   const navigate = useNavigate();
+  const { startTimer } = useTimer();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -40,29 +44,14 @@ export function TaskForm({ task }: { task?: Mesa02 }) {
     async function onSubmit(values: z.infer<typeof formSchema>) {
       if (!task) return;
       try {
-        const now = new Date();
-
-        const year = now.getFullYear();
-        const month = (now.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based
-        const day = now.getDate().toString().padStart(2, '0');
-        const formattedDate = `${year}-${month}-${day}`;
-
-        const hours = now.getHours().toString().padStart(2, '0');
-        const minutes = now.getMinutes().toString().padStart(2, '0');
-        const seconds = now.getSeconds().toString().padStart(2, '0');
-        const time = `${hours}:${minutes}:${seconds}`;
-
-        await db.execute(
-          'INSERT into daily (fecha, marca,documento,estado,estnue,horini,nota,tiempo,cerrar) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
-          [formattedDate, task.marca, task.documento, task.estado, 'E', time, values.nota, 0, 'N']
-        );
+        await startTimer(task, values.nota);
         navigate('/daily');
         return;
       } catch (e) {
         toast('Error Iniciando la tarea');
       }
     },
-    [task, navigate]
+    [task, navigate, startTimer]
   );
 
   return (

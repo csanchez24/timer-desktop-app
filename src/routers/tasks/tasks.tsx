@@ -2,7 +2,7 @@ import { NavLink } from 'react-router';
 import { format } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTasks } from '@/hooks/tasks';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -22,6 +22,8 @@ import { TaskForm } from '../task/task-form';
 import { Mesa02 } from '@/schemas/mesa02';
 import { Icons } from '@/components/icons';
 import { SuspenceForm } from '../task/suspence-form';
+import { DailyTask } from '@/schemas/daily-task';
+import { db } from '@/db';
 
 export default function Tasks() {
   const { data: tasks, isLoading } = useTasks();
@@ -44,6 +46,21 @@ export default function Tasks() {
         task.descripcion.toLowerCase().includes(searchText.toLowerCase())
     );
   }, [tasks, searchText]);
+
+  const [dailyTask, setDailyTask] = useState<DailyTask>();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = (await db.select('SELECT * FROM daily WHERE horfin IS NULL')) as DailyTask[];
+        setDailyTask(res.at(0));
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="container">
@@ -91,6 +108,9 @@ export default function Tasks() {
             >
               <div className="flex justify-between">
                 <div>
+                  <p className="text-sm">
+                    {task.marca} - {task.documento}
+                  </p>
                   <p className="text-sm">{task.usuario_mesa}</p>
                   <p className="text-sm">{task.codigo_area}</p>
                   <p className="text-sm">{task.descripcion}</p>
@@ -102,15 +122,20 @@ export default function Tasks() {
                       <Icons.EllipsisVertical />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                      <DropdownMenuItem
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          setMesa02(task);
-                          setStartTaskDialog(true);
-                        }}
-                      >
-                        Iniciar
-                      </DropdownMenuItem>
+                      {!(
+                        dailyTask?.marca === task.marca && dailyTask?.documento === task.documento
+                      ) && (
+                        <DropdownMenuItem
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            setMesa02(task);
+                            setStartTaskDialog(true);
+                          }}
+                        >
+                          Iniciar
+                        </DropdownMenuItem>
+                      )}
+
                       <DropdownMenuItem
                         onClick={async (e) => {
                           e.stopPropagation();

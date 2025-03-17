@@ -5,6 +5,7 @@ import { DailyTask } from '@/schemas/daily-task';
 import { useEffect, useMemo, useState } from 'react';
 import { FinishForm } from './finish-form';
 import { Switch } from '@/components/ui/switch';
+import { formatTime } from '@/utils/format-time';
 
 export default function Finish() {
   const [data, setData] = useState<DailyTask[]>([]);
@@ -40,11 +41,7 @@ export default function Finish() {
     if (!data) return;
     const total = data?.reduce((pre, acc) => pre + parseInt(acc.tiempo ?? '0'), 0);
 
-    const hrs = String(Math.floor(total / 3600)).padStart(2, '0');
-    const mins = String(Math.floor((total % 3600) / 60)).padStart(2, '0');
-    const secs = String(total % 60).padStart(2, '0');
-
-    return `${hrs}:${mins}:${secs}`;
+    return formatTime(total);
   }, [data]);
 
   const markedChecked = async (checked: boolean, numero: number) => {

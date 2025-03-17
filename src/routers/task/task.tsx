@@ -13,7 +13,9 @@ import { TaskForm } from './task-form';
 import { useTask } from '@/hooks/tasks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SuspenceForm } from './suspence-form';
-import { createElement, ReactNode } from 'react';
+import { createElement, ReactNode, useEffect, useState } from 'react';
+import { DailyTask } from '@/schemas/daily-task';
+import { db } from '@/db';
 
 function InfoBlock({
   label,
@@ -36,6 +38,25 @@ export default function Task() {
   const { marca, documento } = useParams();
 
   const { data: task, isLoading } = useTask(marca, documento);
+  const [dailyTask, setDailyTask] = useState<DailyTask>();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = (await db.select(
+          'SELECT * FROM daily WHERE marca=$1 AND documento=$2 AND horfin IS NULL',
+          [task?.data?.mesa02?.marca, task?.data?.mesa02?.documento]
+        )) as DailyTask[];
+        setDailyTask(res.at(0));
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    if (task) {
+      fetchData();
+    }
+  }, [task]);
 
   const Link = task?.data?.mesa02?.usuario_responsable ? (
     <NavLink to={`${task.data.mesa02.archivo_adjunto}`} target="_blank" rel="noopener noreferrer">
@@ -45,7 +66,7 @@ export default function Task() {
 
   const data = [
     { label: 'Marca', value: task?.data?.mesa02.marca },
-    { label: 'Documento', value: task?.data?.mesa02.marca },
+    { label: 'Documento', value: task?.data?.mesa02.documento },
     { label: 'Fecha', value: task?.data?.mesa02.fecha_creacion },
     { label: 'Hora', value: task?.data?.mesa02.hora_creacion },
     { label: 'Usuario', value: task?.data?.mesa02.usuario_mesa },
@@ -77,22 +98,25 @@ export default function Task() {
           </div>
         </div>
         <div className="flex gap-3">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button>
-                Iniciar <Play />
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="">
-              <SheetHeader>
-                <SheetTitle>Arrancar la tarea</SheetTitle>
-                <SheetDescription>Esta accion iniciar la tarea y su tiempo</SheetDescription>
-              </SheetHeader>
-              <div className="p-4">
-                <TaskForm task={task?.data?.mesa02} />
-              </div>
-            </SheetContent>
-          </Sheet>
+          {!dailyTask && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button>
+                  Iniciar <Play />
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="">
+                <SheetHeader>
+                  <SheetTitle>Arrancar la tarea</SheetTitle>
+                  <SheetDescription>Esta accion iniciar la tarea y su tiempo</SheetDescription>
+                </SheetHeader>
+                <div className="p-4">
+                  <TaskForm task={task?.data?.mesa02} />
+                </div>
+              </SheetContent>
+            </Sheet>
+          )}
+
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline">

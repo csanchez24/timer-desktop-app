@@ -12,24 +12,27 @@ import Task from './routers/task/task';
 import Daily from './routers/daily/daily';
 import Finish from './routers/finish/finish';
 import Settings from './routers/settings/settings';
+import { TimerProvider } from './components/timer-context';
 
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" index element={<Tasks />} />
-            <Route path="/tasks/:marca/:documento" element={<Task />} />
-            <Route path="/daily" element={<Daily />} />
-            <Route path="/finish" element={<Finish />} />
-            <Route path="/settings" element={<Settings />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-      <ReactQueryDevtools initialIsOpen={false} />
+      <TimerProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" index element={<Tasks />} />
+              <Route path="/tasks/:marca/:documento" element={<Task />} />
+              <Route path="/daily" element={<Daily />} />
+              <Route path="/finish" element={<Finish />} />
+              <Route path="/settings" element={<Settings />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </TimerProvider>
     </QueryClientProvider>
     <Toaster />
   </React.StrictMode>

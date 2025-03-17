@@ -45,7 +45,7 @@ export default function Daily() {
     <div className="container">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h1 className="text-lg">Tareas Activas</h1>
+          <h1 className="text-lg">Tareas Activa</h1>
         </div>
         <div>
           <AlertDialog>
@@ -82,24 +82,47 @@ export default function Daily() {
           <Skeleton className="h-24 w-full rounded-xl" />
         </div>
       )}
-      <div className="flex flex-col gap-3">
-        {data?.map((daily) => (
-          <div className="block rounded-xl border p-4 shadow">
-            <div className="flex justify-between">
-              <div className="text-sm">
-                <p>
-                  {daily.marca} - {daily.documento}
-                </p>
-                <p>{daily.nota}</p>
-              </div>
-              <div className="text-secondary text-sm font-bold">
-                <Button variant="ghost">
-                  <Play className="text-black" />
-                </Button>
+      <div className="mb-4 flex flex-col gap-3">
+        {data
+          ?.filter((d) => !d.horfin)
+          .map((daily) => (
+            <div className="block rounded-xl border p-4 shadow">
+              <div className="flex items-center justify-between">
+                <div className="text-sm">
+                  <p>
+                    {daily.marca} - {daily.documento}
+                  </p>
+                  <p>{daily.nota}</p>
+                </div>
+                <div className="text-secondary text-sm font-bold">{daily.tiempo}</div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+      </div>
+      <div>
+        <h2 className="mb-4 text-lg">Tareas Inactiva</h2>
+        <div className="flex flex-col gap-3">
+          {data
+            ?.filter((d) => d.horfin)
+            .map((daily) => (
+              <div className="block rounded-xl border p-4 shadow">
+                <div className="flex justify-between">
+                  <div className="text-sm">
+                    <p>
+                      {daily.marca} - {daily.documento}
+                    </p>
+                    <p>{daily.nota}</p>
+                  </div>
+                  <div className="text-secondary flex items-center text-sm font-bold">
+                    <div className="text-secondary text-sm font-bold">{daily.tiempo}</div>
+                    <Button variant="ghost">
+                      <Play className="text-black" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+        </div>
       </div>
     </div>
   );
