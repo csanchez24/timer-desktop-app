@@ -2,6 +2,8 @@ import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { fetch } from '@tauri-apps/plugin-http';
 import { DailyTask } from '@/schemas/daily-task';
+import { BASEURL } from '@/constants';
+import { getSettings } from '@/utils/get-settings';
 
 export const useFinishDay = ({
   onSuccess,
@@ -21,15 +23,19 @@ export const useFinishDay = ({
       tiempo: string;
       nota: string;
     }) => {
+      const settings = await getSettings();
       const formData = new FormData(); // Collect form data
       formData.set('tasks', JSON.stringify(tasks));
       formData.set('horini', horini);
       formData.set('horfin', horfin);
       formData.set('tiempo', tiempo);
       formData.set('nota', nota);
-      const res = await fetch('', {
+      const res = await fetch(`${BASEURL}/finishDay`, {
         method: 'POST',
         body: formData,
+        headers: {
+          Authorization: `Bearer ${settings.token}`,
+        },
       });
       if (!res.ok) {
         return null;

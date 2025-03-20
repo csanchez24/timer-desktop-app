@@ -24,10 +24,16 @@ import { Icons } from '@/components/icons';
 import { SuspenceForm } from '../task/suspence-form';
 import { DailyTask } from '@/schemas/daily-task';
 import { db } from '@/db';
+import { useTimer } from '@/components/timer-context';
+import { formatTime } from '@/utils/format-time';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Badge } from '@/components/ui/badge';
 
 export default function Tasks() {
   const { data: tasks, isLoading } = useTasks();
+  const { time, isRunning } = useTimer();
 
+  const [toggle, setToggle] = useState<string>('todos');
   const [mesa02, setMesa02] = useState<Mesa02>();
   const [openStartTaskDialog, setStartTaskDialog] = useState(false);
   const [openSuspenceTaskDialog, setSuspenceTaskDialog] = useState(false);
@@ -38,14 +44,19 @@ export default function Tasks() {
   }, []);
 
   const filterTasks = useMemo(() => {
-    if (!searchText) return tasks?.data.casusu;
-    return tasks?.data.casusu.filter(
-      (task) =>
-        task.marca.toLowerCase().includes(searchText.toLowerCase()) ||
-        task.documento.toLowerCase().includes(searchText.toLowerCase()) ||
-        task.descripcion.toLowerCase().includes(searchText.toLowerCase())
-    );
-  }, [tasks, searchText]);
+    if (!searchText && !toggle) return tasks?.data.casusu;
+
+    return tasks?.data.casusu.filter((task) => {
+      const textFilter = searchText
+        ? task.marca.toLowerCase().includes(searchText.toLowerCase()) ||
+          task.documento.toLowerCase().includes(searchText.toLowerCase()) ||
+          task.descripcion.toLowerCase().includes(searchText.toLowerCase())
+        : true;
+      const toggleFilter = toggle === 'todos' || toggle === 'internos' || task.estado === toggle;
+      const marcaFilter = toggle === 'internos' ? task.marca === 'SS' : true;
+      return textFilter && toggleFilter && marcaFilter;
+    });
+  }, [tasks, searchText, toggle]);
 
   const [dailyTask, setDailyTask] = useState<DailyTask>();
 
@@ -68,8 +79,15 @@ export default function Tasks() {
         <div>
           <h1 className="mb-4 text-lg">Tasks</h1>
         </div>
-        <div>
-          <p className="">Total casos: {tasks?.data?.casusu?.length ?? 0}</p>
+        <div className="flex gap-3">
+          <div>
+            <p className="">Total casos: {tasks?.data?.casusu?.length ?? 0}</p>
+          </div>
+          {isRunning && (
+            <div>
+              <p className="">Tiempo: {formatTime(time)}</p>
+            </div>
+          )}
         </div>
       </div>
       <div>
@@ -85,6 +103,38 @@ export default function Tasks() {
               />
             </div>
           </form>
+        </div>
+        <div className="mb-4 flex gap-3">
+          <ToggleGroup
+            variant="outline"
+            size="lg"
+            type="single"
+            defaultValue={toggle}
+            value={toggle}
+            onValueChange={(value) => setToggle(value)}
+          >
+            <ToggleGroupItem value="todos" aria-label="Toggle bold">
+              Todos <Badge variant="default">{tasks?.data?.casusu?.length ?? 0}</Badge>
+            </ToggleGroupItem>
+            <ToggleGroupItem value="ASIGNADO" aria-label="Toggle bold">
+              Asignados
+              <Badge variant="default">
+                {tasks?.data?.casusu?.filter((task) => task.estado === 'ASIGNADO').length ?? 0}
+              </Badge>
+            </ToggleGroupItem>
+            <ToggleGroupItem value="EN PROCESO" aria-label="Toggle italic">
+              En Proceso
+              <Badge variant="default">
+                {tasks?.data?.casusu?.filter((task) => task.estado === 'EN PROCESO').length ?? 0}
+              </Badge>
+            </ToggleGroupItem>
+            <ToggleGroupItem value="internos" aria-label="Toggle underline">
+              Internos
+              <Badge variant="default">
+                {tasks?.data?.casusu?.filter((task) => task.marca === 'SS').length ?? 0}
+              </Badge>
+            </ToggleGroupItem>
+          </ToggleGroup>
         </div>
         {isLoading && (
           <div className="flex flex-col gap-3">
@@ -114,6 +164,7 @@ export default function Tasks() {
                   <p className="text-sm">{task.usuario_mesa}</p>
                   <p className="text-sm">{task.codigo_area}</p>
                   <p className="text-sm">{task.descripcion}</p>
+                  <p className="text-sm">{task.estado}</p>
                   <p className="text-sm">{format(task.fecha_creacion, 'yyyy-MM-dd')}</p>
                 </div>
                 <div>

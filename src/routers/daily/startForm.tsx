@@ -1,4 +1,5 @@
 'use client';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -15,10 +16,10 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
-import { Mesa02 } from '@/schemas/mesa02';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
+import { DailyTask } from '@/schemas/daily-task';
 
 const formSchema = z.object({
   nota: z.string().min(2, {
@@ -26,7 +27,7 @@ const formSchema = z.object({
   }),
 });
 
-export function TaskForm({ task }: { task?: Mesa02 }) {
+export function StartForm({ task, onSuccess }: { task?: DailyTask; onSuccess?(): void }) {
   const navigate = useNavigate();
   const { startTimer } = useTimer();
 
@@ -47,13 +48,13 @@ export function TaskForm({ task }: { task?: Mesa02 }) {
           estado: task.estado,
           nota: values.nota,
         });
-        navigate('/daily');
+        onSuccess?.();
         return;
       } catch (e) {
         toast('Error Iniciando la tarea');
       }
     },
-    [task, navigate, startTimer]
+    [task, navigate, startTimer, onSuccess]
   );
 
   return (

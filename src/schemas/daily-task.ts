@@ -8,6 +8,6 @@ export type DailyTask = {
   horini: string; // CHAR(5), time format "HH:MM"
   horfin?: string; // CHAR(5), nullable, time format "HH:MM"
   nota: string; // TEXT, a long string
-  esttra: 'A' | 'S'; // ENUM, only 'A' or 'S'
   tiempo?: string; // CHAR(6), nullable, time format "HH:MM"
+  cerrar: 'S' | 'N'; // ENUM, only 'S' or 'N'
 };

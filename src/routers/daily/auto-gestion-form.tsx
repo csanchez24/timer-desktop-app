@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
-import { useSuspensions } from '@/hooks/basics';
+import { useProjects } from '@/hooks/basics';
 import {
   Select,
   SelectContent,
@@ -21,22 +21,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Mesa02 } from '@/schemas/mesa02';
 
 const formSchema = z.object({
-  codsus: z.string(),
+  subare: z.string(),
   nota: z.string().min(2, {
     message: 'Nota debe ser al menos 2 letras.',
   }),
 });
 
-export function SuspenceForm({ task }: { task?: Mesa02 }) {
-  const { data: suspensions } = useSuspensions();
+export function AutoGestionForm() {
+  const { data: projects } = useProjects();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      codsus: '',
+      subare: '',
       nota: '',
     },
   });
@@ -52,10 +51,10 @@ export function SuspenceForm({ task }: { task?: Mesa02 }) {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
-          name="codsus"
+          name="subare"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Motivo</FormLabel>
+              <FormLabel>Projecto</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -63,9 +62,9 @@ export function SuspenceForm({ task }: { task?: Mesa02 }) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {suspensions?.data &&
-                    suspensions.data.motsus.map((sus) => (
-                      <SelectItem value={sus.codigo_motivo}>{sus.detalle_motivo}</SelectItem>
+                  {projects?.data &&
+                    projects.data.codpro.map((pro) => (
+                      <SelectItem value={pro.codigo_proyecto}>{pro.detalle_proyecto}</SelectItem>
                     ))}
                 </SelectContent>
               </Select>

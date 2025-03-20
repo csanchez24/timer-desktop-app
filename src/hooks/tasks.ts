@@ -1,4 +1,6 @@
+import { BASEURL } from '@/constants';
 import { RespuestaTask, RespuestaTasks } from '@/schemas/mesa02';
+import { getSettings } from '@/utils/get-settings';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { fetch } from '@tauri-apps/plugin-http';
 import { toast } from 'sonner';
@@ -7,8 +9,12 @@ export const useTasks = () => {
   return useQuery({
     queryKey: ['tasks'],
     queryFn: async () => {
-      const res = await fetch('https://soporte.syseu.com.co/MesaAyuda/webservice/casosUsuario', {
+      const settings = await getSettings();
+      const res = await fetch(`${BASEURL}/casosUsuario`, {
         method: 'GET',
+        headers: {
+          Authorization: `Bearer ${settings.token}`,
+        },
       });
       if (!res.ok) {
         return null;
@@ -24,13 +30,17 @@ export const useTask = (marca?: string, documento?: string) => {
     queryKey: ['task', `${marca}-${documento}`],
     enabled: !!marca && !!documento,
     queryFn: async () => {
+      const settings = await getSettings();
       const formData = new FormData(); // Collect form data
       formData.set('marca', marca ?? '');
       formData.set('documento', documento ?? '');
 
-      const res = await fetch('https://soporte.syseu.com.co/MesaAyuda/webservice/mesa02', {
+      const res = await fetch(`${BASEURL}/mesa02`, {
         method: 'POST',
         body: formData,
+        headers: {
+          Authorization: `Bearer ${settings.token}`,
+        },
       });
       if (!res.ok) {
         return null;
@@ -47,16 +57,62 @@ export const useSuspendTask = ({
 }: { onSuccess?(): void; onError?(): void } = {}) => {
   return useMutation({
     mutationFn: async ({
-      ...body
+      marca,
+      documento,
+      motivo,
+      nota,
     }: {
       marca: string;
       documento: string;
-      codanu: string;
-      note: string;
+      motivo: string;
+      nota: string;
     }) => {
-      const res = await fetch('', {
+      const settings = await getSettings();
+      const formData = new FormData();
+      formData.set('marca', marca ?? '');
+      formData.set('documento', documento ?? '');
+      formData.set('motivo', motivo ?? '');
+      formData.set('nota', nota ?? '');
+      const res = await fetch(`${BASEURL}/suspenderCaso`, {
         method: 'POST',
-        body: JSON.stringify(body),
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${settings.token}`,
+        },
+      });
+      if (!res.ok) {
+        return null;
+      }
+      const data = await res.json();
+      return data;
+    },
+    async onSuccess() {
+      toast('bien', { description: 'bien' });
+      onSuccess?.();
+    },
+    onError(e) {
+      toast('mal', { description: e.message });
+      onError?.();
+    },
+  });
+};
+
+export const useAutoTask = ({
+  onSuccess,
+  onError,
+}: { onSuccess?(): void; onError?(): void } = {}) => {
+  return useMutation({
+    mutationFn: async ({ subare, note }: { subare: string; note: string }) => {
+      const settings = await getSettings();
+      const formData = new FormData();
+      formData.set('subarea', subare ?? '');
+      formData.set('note', note ?? '');
+      const res = await fetch(`${BASEURL}/autogestionCaso`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${settings.token}`,
+        },
       });
       if (!res.ok) {
         return null;

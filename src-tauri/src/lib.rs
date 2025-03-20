@@ -41,7 +41,6 @@ pub fn run() {
         },
     ];
 
-    // Initialize and configure Tauri
     tauri::Builder::default()
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_opener::init()) // Register file opener plugin

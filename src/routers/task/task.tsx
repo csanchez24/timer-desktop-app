@@ -58,7 +58,7 @@ export default function Task() {
     }
   }, [task]);
 
-  const Link = task?.data?.mesa02?.usuario_responsable ? (
+  const Link = task?.data?.mesa02?.archivo_adjunto ? (
     <NavLink to={`${task.data.mesa02.archivo_adjunto}`} target="_blank" rel="noopener noreferrer">
       Click Here
     </NavLink>

@@ -14,9 +14,8 @@
     "http:default",
     {
       "identifier": "http:default",
-      "allow": [{ "url": "https://soporte.syseu.com.co/*" }],
+      "allow": [{ "url": "https://soporte.syseu.com.co/*" }, { "url": "https://desarrollo.soporte.syseu.com.co/*" }],
       "deny": [{ "url": "https://private.tauri.app" }]
     }
   ]
 }
-

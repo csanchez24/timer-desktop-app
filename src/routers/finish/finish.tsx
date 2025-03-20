@@ -6,26 +6,30 @@ import { useEffect, useMemo, useState } from 'react';
 import { FinishForm } from './finish-form';
 import { Switch } from '@/components/ui/switch';
 import { formatTime } from '@/utils/format-time';
+import { differenceInSeconds } from 'date-fns';
 
 export default function Finish() {
   const [data, setData] = useState<DailyTask[]>([]);
-  const [refecth, setRefecth] = useState(true);
+  const [refetch, setRefetch] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = (await db.select('SELECT * FROM daily')) as DailyTask[];
+        const res = (await db.select('SELECT * FROM daily ORDER BY numero ASC')) as DailyTask[];
         setData(res);
-        setRefecth(false);
+        setRefetch(false);
       } catch (err) {
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchData();
-  }, [refecth]);
+    console.log(refetch);
+    if (refetch) {
+      fetchData();
+    }
+  }, [refetch]);
 
   const startTime = useMemo(() => {
     if (!data) return;
@@ -34,7 +38,7 @@ export default function Finish() {
 
   const endTime = useMemo(() => {
     if (!data) return;
-    return data.at(0)?.horfin;
+    return data.at(-1)?.horfin;
   }, [data]);
 
   const time = useMemo(() => {
@@ -46,7 +50,7 @@ export default function Finish() {
 
   const markedChecked = async (checked: boolean, numero: number) => {
     await db.execute('UPDATE daily SET cerrar = ? WHERE numero = ?', [checked ? 'S' : 'N', numero]);
-    setRefecth(true);
+    setRefetch(true);
     return;
   };
 
@@ -72,16 +76,21 @@ export default function Finish() {
                 </p>
                 <p className="mb-2">{daily.nota}</p>
                 <div className="flex items-center space-x-2">
-                  <Switch onCheckedChange={(checked) => markedChecked(checked, daily.numero)} />
+                  <Switch
+                    checked={daily.cerrar === 'S'}
+                    onCheckedChange={(checked) => markedChecked(checked, daily.numero)}
+                  />
                   <Label>Cerrar Caso</Label>
                 </div>
               </div>
-              <div className="text-primary text-lg font-bold">{daily.tiempo}</div>
+              <div className="text-primary text-lg font-bold">
+                {formatTime(parseInt(daily.tiempo + ''))}
+              </div>
             </div>
           </div>
         ))}
       </div>
-      <div className="mb-4 flex justify-between gap-2">
+      <div className="mb-4 flex flex-wrap justify-between gap-2">
         <p>Hora Inicial: {startTime}</p>
         <p>Hora Final: {endTime}</p>
         <p>Tiempo: {time}</p>
