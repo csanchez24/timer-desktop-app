@@ -73,7 +73,7 @@ export function TaskForm({ task }: { task?: Mesa02 }) {
             </FormItem>
           )}
         />
-        <Button type="submit">Empezar</Button>
+        <Button type="submit">Empezar Caso</Button>
       </form>
     </Form>
   );

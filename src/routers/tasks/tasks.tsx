@@ -1,16 +1,13 @@
-import { NavLink } from 'react-router';
-import { format, formatDistanceToNowStrict } from 'date-fns';
-import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTasks } from '@/hooks/tasks';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Icons } from '@/components/icons';
+import { useTimer } from '@/components/timer-context';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import {
   Sheet,
   SheetContent,
@@ -18,16 +15,19 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { TaskForm } from '../task/task-form';
-import { Mesa02 } from '@/schemas/mesa02';
-import { Icons } from '@/components/icons';
-import { SuspenceForm } from '../task/suspence-form';
-import { DailyTask } from '@/schemas/daily-task';
-import { db } from '@/db';
-import { useTimer } from '@/components/timer-context';
-import { formatTime } from '@/utils/format-time';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Badge } from '@/components/ui/badge';
+import { db } from '@/db';
+import { useTasks } from '@/hooks/tasks';
+import { DailyTask } from '@/schemas/daily-task';
+import { Mesa02 } from '@/schemas/mesa02';
+import { formatTime } from '@/utils/format-time';
+import { format, formatDistanceToNowStrict } from 'date-fns';
+import { Search } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { NavLink } from 'react-router';
+import { SuspenceForm } from '../task/suspence-form';
+import { TaskForm } from '../task/task-form';
 
 export default function Tasks() {
   const { data: tasks, isLoading } = useTasks();
@@ -196,6 +196,7 @@ export default function Tasks() {
                           setMesa02(task);
                           setSuspenceTaskDialog(true);
                         }}
+                        className="text-red-500"
                       >
                         Suspender
                       </DropdownMenuItem>

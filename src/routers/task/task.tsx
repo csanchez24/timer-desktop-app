@@ -7,15 +7,15 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { ArrowLeft, CircleStop, Play } from 'lucide-react';
-import { NavLink, useParams } from 'react-router';
-import { TaskForm } from './task-form';
-import { useTask } from '@/hooks/tasks';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SuspenceForm } from './suspence-form';
-import { createElement, ReactNode, useEffect, useState } from 'react';
-import { DailyTask } from '@/schemas/daily-task';
 import { db } from '@/db';
+import { useTask } from '@/hooks/tasks';
+import { DailyTask } from '@/schemas/daily-task';
+import { ArrowLeft, CircleStop, Play } from 'lucide-react';
+import { createElement, ReactNode, useEffect, useState } from 'react';
+import { NavLink, useParams } from 'react-router';
+import { SuspenceForm } from './suspence-form';
+import { TaskForm } from './task-form';
 
 function InfoBlock({
   label,
@@ -94,7 +94,7 @@ export default function Task() {
             <NavLink to="/">
               <ArrowLeft />
             </NavLink>
-            <h1 className="text-lg">Tasks</h1>
+            <h1 className="text-lg">Caso</h1>
           </div>
         </div>
         <div className="flex gap-3">
@@ -107,10 +107,12 @@ export default function Task() {
               </SheetTrigger>
               <SheetContent className="">
                 <SheetHeader>
-                  <SheetTitle>Arrancar la tarea</SheetTitle>
-                  <SheetDescription>Esta accion iniciar la tarea y su tiempo</SheetDescription>
+                  <SheetTitle>Iniciar el caso</SheetTitle>
+                  <SheetDescription>
+                    Esta accion iniciara el caso y empezara a contar el tiempo.
+                  </SheetDescription>
                 </SheetHeader>
-                <div className="p-4">
+                <div className="px-4">
                   <TaskForm task={task?.data?.mesa02} />
                 </div>
               </SheetContent>
@@ -119,17 +121,17 @@ export default function Task() {
 
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="outline">
+              <Button variant="destructive">
                 Suspender <CircleStop />
               </Button>
             </SheetTrigger>
             <SheetContent className="">
               <SheetHeader>
-                <SheetTitle>Suspender la tarea</SheetTitle>
-                <SheetDescription>Esta accion suspendera la tarea</SheetDescription>
+                <SheetTitle>Suspender el Caso</SheetTitle>
+                <SheetDescription>Esta accion suspendera el Caso</SheetDescription>
               </SheetHeader>
-              <div className="p-4">
-                <SuspenceForm />
+              <div className="px-4">
+                <SuspenceForm task={task?.data?.mesa02} />
               </div>
             </SheetContent>
           </Sheet>

@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -12,8 +13,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Textarea } from '@/components/ui/textarea';
-import { useSuspensions } from '@/hooks/basics';
 import {
   Select,
   SelectContent,
@@ -21,7 +20,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { useSuspensions } from '@/hooks/basics';
+import { useSuspendTask } from '@/hooks/tasks';
 import { Mesa02 } from '@/schemas/mesa02';
+import { useCallback } from 'react';
+import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
 
 const formSchema = z.object({
   codsus: z.string(),
@@ -31,7 +36,9 @@ const formSchema = z.object({
 });
 
 export function SuspenceForm({ task }: { task?: Mesa02 }) {
+  const navigate = useNavigate();
   const { data: suspensions } = useSuspensions();
+  const { mutateAsync: suspended, isPending } = useSuspendTask();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -41,11 +48,25 @@ export function SuspenceForm({ task }: { task?: Mesa02 }) {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-  }
+  const onSubmit = useCallback(
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+      try {
+        if (!task) return;
+        await suspended({
+          marca: task.marca,
+          documento: task.documento,
+          motivo: values.codsus,
+          nota: values.nota,
+        });
+        toast('Se suspendio con exito.');
+        navigate('/');
+      } catch (e) {
+        toast('Error Suspendiendo');
+        console.log(e);
+      }
+    },
+    [task, suspended]
+  );
 
   return (
     <Form {...form}>
@@ -58,8 +79,8 @@ export function SuspenceForm({ task }: { task?: Mesa02 }) {
               <FormLabel>Motivo</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select" />
+                  <SelectTrigger className="w-full max-w-[350px]">
+                    <SelectValue placeholder="Seleccione un motivo" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -86,7 +107,10 @@ export function SuspenceForm({ task }: { task?: Mesa02 }) {
             </FormItem>
           )}
         />
-        <Button type="submit">Suspender</Button>
+        <Button disabled={isPending} type="submit">
+          {isPending && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
+          Suspender Caso
+        </Button>
       </form>
     </Form>
   );

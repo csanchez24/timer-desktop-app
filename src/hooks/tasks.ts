@@ -87,7 +87,6 @@ export const useSuspendTask = ({
       return data;
     },
     async onSuccess() {
-      toast('bien', { description: 'bien' });
       onSuccess?.();
     },
     onError(e) {
