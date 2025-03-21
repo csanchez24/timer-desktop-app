@@ -6,7 +6,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import './style.css';
 import { Toaster } from './components/ui/sonner';
-import Layout from './layout';
+import Layout from './components/layout';
 import Tasks from './routers/tasks/tasks';
 import Task from './routers/task/task';
 import Daily from './routers/daily/daily';

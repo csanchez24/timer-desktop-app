@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router';
-import { format } from 'date-fns';
+import { format, formatDistanceToNowStrict } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -77,11 +77,11 @@ export default function Tasks() {
     <div className="container">
       <div className="flex justify-between">
         <div>
-          <h1 className="mb-4 text-lg">Tasks</h1>
+          <h1 className="mb-4 text-lg">Casos</h1>
         </div>
         <div className="flex gap-3">
           <div>
-            <p className="">Total casos: {tasks?.data?.casusu?.length ?? 0}</p>
+            <p className="">Total Casos: {tasks?.data?.casusu?.length ?? 0}</p>
           </div>
           {isRunning && (
             <div>
@@ -96,7 +96,7 @@ export default function Tasks() {
             <div className="relative">
               <Search className="text-muted-foreground absolute top-2.5 left-2 h-4 w-4" />
               <Input
-                placeholder="Filtrar"
+                placeholder="Filtrar Casos"
                 className="pl-8"
                 value={searchText}
                 onChange={onSearch}
@@ -161,11 +161,14 @@ export default function Tasks() {
                   <p className="text-sm">
                     {task.marca} - {task.documento}
                   </p>
-                  <p className="text-sm">{task.usuario_mesa}</p>
-                  <p className="text-sm">{task.codigo_area}</p>
-                  <p className="text-sm">{task.descripcion}</p>
-                  <p className="text-sm">{task.estado}</p>
-                  <p className="text-sm">{format(task.fecha_creacion, 'yyyy-MM-dd')}</p>
+                  <p className="mb-2 text-sm">
+                    {task.codigo_area} - {task.usuario_mesa}
+                  </p>
+                  <p className="mb-2 text-sm">{task.descripcion}</p>
+                  <p className="flex items-center gap-2 text-sm">
+                    {task.estado} {format(task.fecha_creacion, 'yyyy-MM-dd')}{' '}
+                    <Badge>{formatDistanceToNowStrict(task.fecha_creacion)}</Badge>
+                  </p>
                 </div>
                 <div>
                   <DropdownMenu>
