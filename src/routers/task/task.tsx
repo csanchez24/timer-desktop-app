@@ -8,11 +8,9 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
-import { initDB } from '@/db';
 import { useTask } from '@/hooks/tasks';
-import { DailyTask } from '@/schemas/daily-task';
 import { ArrowLeft, CircleStop, Play } from 'lucide-react';
-import { createElement, ReactNode, useEffect, useState } from 'react';
+import { createElement, ReactNode } from 'react';
 import { NavLink, useParams } from 'react-router';
 import { SuspenceForm } from './suspence-form';
 import { TaskForm } from './task-form';
@@ -38,26 +36,6 @@ export default function Task() {
   const { marca, documento } = useParams();
 
   const { data: task, isLoading } = useTask(marca, documento);
-  const [dailyTask, setDailyTask] = useState<DailyTask>();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const db = await initDB();
-        const res = (await db.select(
-          'SELECT * FROM daily WHERE marca=$1 AND documento=$2 AND horfin IS NULL',
-          [task?.data?.mesa02?.marca, task?.data?.mesa02?.documento]
-        )) as DailyTask[];
-        setDailyTask(res.at(0));
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    if (task) {
-      fetchData();
-    }
-  }, [task]);
 
   const Link = task?.data?.mesa02?.archivo_adjunto ? (
     <NavLink to={`${task.data.mesa02.archivo_adjunto}`} target="_blank" rel="noopener noreferrer">
@@ -99,26 +77,24 @@ export default function Task() {
           </div>
         </div>
         <div className="flex gap-3">
-          {!dailyTask && (
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button>
-                  Iniciar <Play />
-                </Button>
-              </SheetTrigger>
-              <SheetContent className="">
-                <SheetHeader>
-                  <SheetTitle>Iniciar el caso</SheetTitle>
-                  <SheetDescription>
-                    Esta accion iniciara el caso y empezara a contar el tiempo.
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="px-4">
-                  <TaskForm task={task?.data?.mesa02} />
-                </div>
-              </SheetContent>
-            </Sheet>
-          )}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button>
+                Iniciar <Play />
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="">
+              <SheetHeader>
+                <SheetTitle>Iniciar el caso</SheetTitle>
+                <SheetDescription>
+                  Esta accion iniciara el caso y empezara a contar el tiempo.
+                </SheetDescription>
+              </SheetHeader>
+              <div className="px-4">
+                <TaskForm task={task?.data?.mesa02} />
+              </div>
+            </SheetContent>
+          </Sheet>
 
           <Sheet>
             <SheetTrigger asChild>

@@ -2,34 +2,13 @@ import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
 import { initDB } from '@/db';
-import { DailyTask } from '@/schemas/daily-task';
 import { formatTime } from '@/utils/format-time';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { FinishForm } from './finish-form';
+import { useDailyTask } from '@/hooks/daily';
 
 export default function Finish() {
-  const [data, setData] = useState<DailyTask[]>([]);
-  const [refetch, setRefetch] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const db = await initDB();
-        const res = (await db.select('SELECT * FROM daily ORDER BY numero ASC')) as DailyTask[];
-        setData(res);
-        setRefetch(false);
-      } catch (err) {
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    console.log(refetch);
-    if (refetch) {
-      fetchData();
-    }
-  }, [refetch]);
+  const { data, isLoading, refetch } = useDailyTask();
 
   const startTime = useMemo(() => {
     if (!data) return;
@@ -51,7 +30,7 @@ export default function Finish() {
   const markedChecked = async (checked: boolean, numero: number) => {
     const db = await initDB();
     await db.execute('UPDATE daily SET cerrar = ? WHERE numero = ?', [checked ? 'S' : 'N', numero]);
-    setRefetch(true);
+    refetch();
     return;
   };
 
@@ -68,7 +47,7 @@ export default function Finish() {
         </div>
       )}
       <div className="mb-4 flex flex-col gap-2">
-        {data.map((daily) => (
+        {data?.map((daily) => (
           <div className="block rounded-xl border p-3 shadow">
             <div className="flex items-center justify-between">
               <div className="text-sm">

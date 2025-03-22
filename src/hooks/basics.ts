@@ -11,7 +11,7 @@ export const useMesa01 = () => {
     queryKey: ['mesa01'],
     queryFn: async () => {
       const settings = await getSettings();
-      const res = await fetch(`${BASEURL}/mesa02`, {
+      const res = await fetch(`${BASEURL}/mesa01`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${settings.token}`,

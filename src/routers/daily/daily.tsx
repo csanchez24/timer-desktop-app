@@ -28,20 +28,18 @@ import {
 } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { initDB } from '@/db';
 import { DailyTask } from '@/schemas/daily-task';
 import { formatTime } from '@/utils/format-time';
 import { BookA, Play } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { AutoGestionForm } from './auto-gestion-form';
 import { StartForm } from './startForm';
+import { useDailyTask } from '@/hooks/daily';
 
 export default function Daily() {
-  const [data, setData] = useState<DailyTask[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [refresh, setRefresh] = useState(true);
   const navigate = useNavigate();
+  const { data, isLoading, refetch } = useDailyTask();
   const { time, pauseTimer } = useTimer();
 
   const [task, setTask] = useState<DailyTask>();
@@ -64,28 +62,10 @@ export default function Daily() {
     [setOpenedAutoDialog]
   );
 
-  const onSuccessAuto = () => {
-    setRefresh(true);
+  const onSuccessAuto = useCallback(() => {
+    refetch();
     setOpenedAutoDialog(false);
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const db = await initDB();
-        const res = (await db.select('SELECT * FROM daily ORDER BY numero DESC')) as DailyTask[];
-        setData(res);
-        setRefresh(false);
-      } catch (err) {
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (refresh) {
-      fetchData();
-    }
-  }, [refresh]);
+  }, [refetch, setOpenedAutoDialog]);
 
   const goToFinishPage = useCallback(async () => {
     await pauseTimer();
@@ -246,7 +226,7 @@ export default function Daily() {
             task={task}
             onSuccess={() => {
               setOpenedDialog(false);
-              setRefresh(true);
+              refetch();
             }}
           />
         </DialogContent>

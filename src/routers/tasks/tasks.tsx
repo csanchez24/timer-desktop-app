@@ -17,20 +17,20 @@ import {
 } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { initDB } from '@/db';
 import { useTasks } from '@/hooks/tasks';
-import { DailyTask } from '@/schemas/daily-task';
 import { Mesa02 } from '@/schemas/mesa02';
 import { formatTime } from '@/utils/format-time';
 import { format, formatDistanceToNowStrict } from 'date-fns';
 import { Search } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { NavLink } from 'react-router';
 import { SuspenceForm } from '../task/suspence-form';
 import { TaskForm } from '../task/task-form';
+import { useMesa01 } from '@/hooks/basics';
 
 export default function Tasks() {
   const { data: tasks, isLoading } = useTasks();
+  const { data: mesa01 } = useMesa01();
   const { time, isRunning } = useTimer();
 
   const [toggle, setToggle] = useState<string>('todos');
@@ -53,26 +53,11 @@ export default function Tasks() {
           task.descripcion.toLowerCase().includes(searchText.toLowerCase())
         : true;
       const toggleFilter = toggle === 'todos' || toggle === 'internos' || task.estado === toggle;
-      const marcaFilter = toggle === 'internos' ? task.marca === 'SS' : true;
+      const marcaFilter =
+        toggle === 'internos' ? task.marca === mesa01?.data?.mesa01?.codigo_area : true;
       return textFilter && toggleFilter && marcaFilter;
     });
-  }, [tasks, searchText, toggle]);
-
-  const [dailyTask, setDailyTask] = useState<DailyTask>();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const db = await initDB();
-        const res = (await db.select('SELECT * FROM daily WHERE horfin IS NULL')) as DailyTask[];
-        setDailyTask(res.at(0));
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    fetchData();
-  }, []);
+  }, [tasks, searchText, toggle, mesa01]);
 
   return (
     <div className="container">
@@ -132,7 +117,9 @@ export default function Tasks() {
             <ToggleGroupItem value="internos" aria-label="Toggle underline">
               Internos
               <Badge variant="default">
-                {tasks?.data?.casusu?.filter((task) => task.marca === 'SS').length ?? 0}
+                {tasks?.data?.casusu?.filter(
+                  (task) => task.marca === mesa01?.data?.mesa01?.codigo_area
+                ).length ?? 0}
               </Badge>
             </ToggleGroupItem>
           </ToggleGroup>
@@ -177,19 +164,15 @@ export default function Tasks() {
                       <Icons.EllipsisVertical />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                      {!(
-                        dailyTask?.marca === task.marca && dailyTask?.documento === task.documento
-                      ) && (
-                        <DropdownMenuItem
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            setMesa02(task);
-                            setStartTaskDialog(true);
-                          }}
-                        >
-                          Iniciar
-                        </DropdownMenuItem>
-                      )}
+                      <DropdownMenuItem
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          setMesa02(task);
+                          setStartTaskDialog(true);
+                        }}
+                      >
+                        Iniciar
+                      </DropdownMenuItem>
 
                       <DropdownMenuItem
                         onClick={async (e) => {
