@@ -56,7 +56,7 @@ export function TaskForm({ task }: { task?: Mesa02 }) {
         toast('Error Iniciando la tarea');
       }
     },
-    [task, navigate, startTimer]
+    [task, navigate, startTimer, toast, navigate]
   );
 
   return (

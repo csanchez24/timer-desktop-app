@@ -1,11 +1,12 @@
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { initDB } from '@/db';
+import { useDailyTask } from '@/hooks/daily';
 import { formatTime } from '@/utils/format-time';
 import { useMemo } from 'react';
 import { FinishForm } from './finish-form';
-import { useDailyTask } from '@/hooks/daily';
 
 export default function Finish() {
   const { data, isLoading, refetch } = useDailyTask();
@@ -53,11 +54,26 @@ export default function Finish() {
       )}
       <div className="mb-4 flex flex-col gap-2">
         {data?.map((daily) => (
-          <div className="block rounded-xl border p-3 shadow">
+          <div className="block rounded-xl border p-4 shadow">
             <div className="flex items-center justify-between">
-              <div className="text-sm">
-                <p className="mb-1">
+              <div className="flex-1 text-sm">
+                <p>
                   {daily.marca} - {daily.documento}
+                </p>
+                <p className="mb-2">
+                  {daily.area} - {daily.usuario}
+                </p>
+                <p className="mb-2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger className="text-left">
+                        {daily.descripcion.substring(0, 80)}...
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-96 text-left">{daily.descripcion}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </p>
                 <p className="mb-2">{daily.nota}</p>
                 <div className="flex items-center space-x-2">

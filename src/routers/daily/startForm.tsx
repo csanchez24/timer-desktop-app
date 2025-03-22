@@ -16,10 +16,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
-import { useCallback } from 'react';
-import { useNavigate } from 'react-router';
-import { toast } from 'sonner';
 import { DailyTask } from '@/schemas/daily-task';
+import { useCallback } from 'react';
+import { toast } from 'sonner';
 
 const formSchema = z.object({
   nota: z.string().min(2, {
@@ -28,7 +27,6 @@ const formSchema = z.object({
 });
 
 export function StartForm({ task, onSuccess }: { task?: DailyTask; onSuccess?(): void }) {
-  const navigate = useNavigate();
   const { startTimer } = useTimer();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -57,7 +55,7 @@ export function StartForm({ task, onSuccess }: { task?: DailyTask; onSuccess?():
         toast('Error Iniciando la tarea');
       }
     },
-    [task, navigate, startTimer, onSuccess]
+    [task, startTimer, onSuccess]
   );
 
   return (

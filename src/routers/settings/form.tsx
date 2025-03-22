@@ -10,13 +10,13 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { initDB } from '@/db';
 import { Settings } from '@/schemas/settings';
-import { toast } from 'sonner';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
 
 const formSchema = z.object({
   token: z.string().min(2, {
@@ -29,7 +29,7 @@ export default function SettingForm({
   onSave,
 }: {
   settings?: Settings;
-  onSave: (settings: Settings) => void;
+  onSave: () => void;
 }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -46,7 +46,7 @@ export default function SettingForm({
       } else {
         await db.execute('UPDATE settings SET token=$1', [values.token]);
       }
-      onSave?.(values);
+      onSave?.();
       toast('se actualizo con exito.');
     },
     [toast, initDB, settings, onSave]

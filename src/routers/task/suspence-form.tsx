@@ -66,7 +66,7 @@ export function SuspenceForm({ task, onSuccess }: { task?: Mesa02; onSuccess?():
         console.log(e);
       }
     },
-    [task, suspended, onSuccess]
+    [task, suspended, onSuccess, toast, navigate]
   );
 
   return (

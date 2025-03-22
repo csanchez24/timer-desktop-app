@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { Icons } from '@/components/icons';
+import { useTimer } from '@/components/timer-context';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -25,7 +26,6 @@ import { useProjects } from '@/hooks/basics';
 import { useAutoTask } from '@/hooks/tasks';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
-import { useTimer } from '@/components/timer-context';
 
 const formSchema = z.object({
   subare: z.string(),
@@ -74,7 +74,7 @@ export function AutoGestionForm({
         console.log(e);
       }
     },
-    [startTimer, create, toast]
+    [startTimer, create, toast, onSuccess, onError]
   );
 
   return (

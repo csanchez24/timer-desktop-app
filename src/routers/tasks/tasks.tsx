@@ -17,7 +17,6 @@ import {
 } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-// import { useMesa01 } from '@/hooks/basics';
 import { useTasks } from '@/hooks/tasks';
 import { Mesa02 } from '@/schemas/mesa02';
 import { formatTime } from '@/utils/format-time';
@@ -31,7 +30,6 @@ import { TaskForm } from '../task/task-form';
 
 export default function Tasks() {
   const { data: tasks, isLoading, refetch } = useTasks();
-  // const { data: mesa01 } = useMesa01();
   const { time, isRunning } = useTimer();
 
   const [toggle, setToggle] = useState<string>('todos');

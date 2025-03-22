@@ -66,7 +66,7 @@ export function DeclineForm({ task, onSuccess }: { task?: Mesa02; onSuccess?(): 
         console.log(e);
       }
     },
-    [task, decline, onSuccess]
+    [task, decline, onSuccess, toast, navigate]
   );
 
   return (

@@ -112,7 +112,7 @@ export const TimerProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const pauseTimer = async () => {
     const db = await initDB();
     const finalTime = getTime();
-    await db.execute('UPDATE daily SET horfin=$1,tiempo=$2 WHERE horfin is null', [
+    await db.execute('UPDATE daily SET horfin=$1,tiempo=$2 WHERE horfin IS NULL', [
       finalTime,
       time,
     ]);

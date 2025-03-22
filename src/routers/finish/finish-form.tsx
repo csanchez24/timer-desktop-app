@@ -66,7 +66,7 @@ export function FinishForm({
         console.log(e);
       }
     },
-    [tasks, horini, horfin, tiempo]
+    [tasks, horini, horfin, tiempo, date, finishDay, toast, navigate, initDB]
   );
 
   return (

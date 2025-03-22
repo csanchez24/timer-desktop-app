@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useDailyTask } from '@/hooks/daily';
 import { DailyTask } from '@/schemas/daily-task';
 import { formatTime } from '@/utils/format-time';
 import { BookA, Play } from 'lucide-react';
@@ -35,7 +36,6 @@ import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { AutoGestionForm } from './auto-gestion-form';
 import { StartForm } from './startForm';
-import { useDailyTask } from '@/hooks/daily';
 
 export default function Daily() {
   const navigate = useNavigate();
@@ -70,7 +70,7 @@ export default function Daily() {
   const goToFinishPage = useCallback(async () => {
     await pauseTimer();
     navigate('/finish');
-  }, []);
+  }, [pauseTimer, navigate]);
 
   const onStartTime = useCallback(
     async function onStartTime(task: DailyTask) {
@@ -145,8 +145,8 @@ export default function Daily() {
           ?.filter((d) => !d.horfin)
           .map((daily) => (
             <div className="block rounded-xl border p-4 shadow">
-              <div className="flex items-center justify-between">
-                <div className="text-sm">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex-1 text-sm">
                   <p>
                     {daily.marca} - {daily.documento}
                   </p>
@@ -179,8 +179,8 @@ export default function Daily() {
             ?.filter((d) => d.horfin)
             .map((daily) => (
               <div className="block rounded-xl border p-4 shadow">
-                <div className="flex justify-between">
-                  <div className="text-sm">
+                <div className="flex justify-between gap-2">
+                  <div className="flex-1 text-sm">
                     <p>
                       {daily.marca} - {daily.documento}
                     </p>
