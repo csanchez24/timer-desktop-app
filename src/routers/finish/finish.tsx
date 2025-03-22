@@ -10,6 +10,11 @@ import { useDailyTask } from '@/hooks/daily';
 export default function Finish() {
   const { data, isLoading, refetch } = useDailyTask();
 
+  const date = useMemo(() => {
+    if (!data) return;
+    return data.at(0)?.fecha;
+  }, [data]);
+
   const startTime = useMemo(() => {
     if (!data) return;
     return data.at(0)?.horini;
@@ -78,6 +83,7 @@ export default function Finish() {
       <div>
         <FinishForm
           tasks={data ?? []}
+          date={date ?? ''}
           horini={startTime ?? ''}
           horfin={endTime ?? ''}
           tiempo={time ?? ''}

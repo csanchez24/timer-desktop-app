@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { useMesa01 } from '@/hooks/basics';
+// import { useMesa01 } from '@/hooks/basics';
 import { useTasks } from '@/hooks/tasks';
 import { Mesa02 } from '@/schemas/mesa02';
 import { formatTime } from '@/utils/format-time';
@@ -31,7 +31,7 @@ import { TaskForm } from '../task/task-form';
 
 export default function Tasks() {
   const { data: tasks, isLoading, refetch } = useTasks();
-  const { data: mesa01 } = useMesa01();
+  // const { data: mesa01 } = useMesa01();
   const { time, isRunning } = useTimer();
 
   const [toggle, setToggle] = useState<string>('todos');
@@ -55,11 +55,10 @@ export default function Tasks() {
           task.descripcion.toLowerCase().includes(searchText.toLowerCase())
         : true;
       const toggleFilter = toggle === 'todos' || toggle === 'internos' || task.estado === toggle;
-      const marcaFilter =
-        toggle === 'internos' ? task.marca === mesa01?.data?.mesa01?.codigo_area : true;
+      const marcaFilter = toggle === 'internos' ? task.marca === 'SS' : true;
       return textFilter && toggleFilter && marcaFilter;
     });
-  }, [tasks, searchText, toggle, mesa01]);
+  }, [tasks, searchText, toggle]);
 
   return (
     <div className="container">
@@ -119,9 +118,7 @@ export default function Tasks() {
             <ToggleGroupItem value="internos" aria-label="Toggle underline">
               Internos
               <Badge variant="default">
-                {tasks?.data?.casusu?.filter(
-                  (task) => task.marca === mesa01?.data?.mesa01?.codigo_area
-                ).length ?? 0}
+                {tasks?.data?.casusu?.filter((task) => task.marca === 'SS').length ?? 0}
               </Badge>
             </ToggleGroupItem>
           </ToggleGroup>

@@ -13,25 +13,31 @@ export const useFinishDay = ({
   return useMutation({
     mutationFn: async ({
       tasks,
+      date,
       horini,
       horfin,
       tiempo,
       nota,
     }: {
       tasks: DailyTask[];
+      date: string;
       horini: string;
       horfin: string;
       tiempo: string;
       nota: string;
     }) => {
       const settings = await getSettings();
-      const formData = new FormData(); // Collect form data
-      formData.set('tasks', JSON.stringify(tasks));
+      const formData = new FormData();
+      const casos = tasks.map((task) => {
+        return { ...task, tieseg: task.tiempo, tiempo: formatTime(parseInt(task.tiempo + '')) };
+      });
+      formData.set('casos', JSON.stringify(casos));
+      formData.set('fecha', date);
       formData.set('horini', horini);
       formData.set('horfin', horfin);
-      formData.set('tiempo_sec', tiempo);
-      formData.set('tiempo', formatTime(parseInt(tiempo)));
+      formData.set('tiempo', tiempo);
       formData.set('nota', nota);
+
       const res = await fetch(`${BASEURL}/cerrarDia`, {
         method: 'POST',
         body: formData,
@@ -39,10 +45,10 @@ export const useFinishDay = ({
           Authorization: `Bearer ${settings.token}`,
         },
       });
-      if (!res.ok) {
-        return null;
-      }
       const data = await res.json();
+      if (!res.ok) {
+        throw new Error();
+      }
       return data;
     },
     async onSuccess() {

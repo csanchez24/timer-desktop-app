@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -15,11 +16,11 @@ import {
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { initDB } from '@/db';
-import { useCallback } from 'react';
-import { toast } from 'sonner';
 import { useFinishDay } from '@/hooks/finish-day';
 import { DailyTask } from '@/schemas/daily-task';
-import { Icons } from '@/components/icons';
+import { useCallback } from 'react';
+import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
 
 const formSchema = z.object({
   nota: z.string().min(2, {
@@ -29,15 +30,18 @@ const formSchema = z.object({
 
 export function FinishForm({
   tasks,
+  date,
   horini,
   horfin,
   tiempo,
 }: {
   tasks?: DailyTask[];
+  date: string;
   horini: string;
   horfin: string;
   tiempo: string;
 }) {
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -51,12 +55,15 @@ export function FinishForm({
     async function onSubmit(values: z.infer<typeof formSchema>) {
       try {
         if (!tasks) return;
-        await finishDay({ tasks, horini, horfin, tiempo, nota: values.nota });
+        await finishDay({ date, tasks, horini, horfin, tiempo, nota: values.nota });
+        toast('Cierre del dia finalizado con exito.');
         const db = await initDB();
         await db.execute('DELETE FROM daily');
+        navigate('/');
         return;
       } catch (e) {
         toast('Error Finanlizando dia');
+        console.log(e);
       }
     },
     [tasks, horini, horfin, tiempo]

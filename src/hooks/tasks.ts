@@ -81,7 +81,7 @@ export const useSuspendTask = ({
         },
       });
       if (!res.ok) {
-        return null;
+        throw new Error();
       }
       const data = await res.json();
       return data;
@@ -126,7 +126,7 @@ export const useDeclineTask = ({
         },
       });
       if (!res.ok) {
-        return null;
+        throw new Error();
       }
       const data = await res.json();
       return data;
@@ -159,10 +159,10 @@ export const useAutoTask = ({
         },
       });
       if (!res.ok) {
-        return null;
+        throw new Error();
       }
-      const data = (await res.json()) as Mesa02;
-      return data;
+      const data = (await res.json()) as { caso: Mesa02 };
+      return data.caso;
     },
     async onSuccess() {
       onSuccess?.();

@@ -57,11 +57,7 @@ export function AutoGestionForm({
           subare: values.subare,
           nota: values.nota,
         });
-        if (!task) {
-          toast('Error creando caso');
-          return;
-        }
-        startTimer({
+        await startTimer({
           marca: task?.marca ?? '',
           documento: task?.documento ?? '',
           estado: 'E',
