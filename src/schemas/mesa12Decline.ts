@@ -1,11 +1,11 @@
-export type Mesa12 = {
+export type Mesa12Decline = {
   codigo: string;
   detalle_motivo: string;
 };
 
-export type RespuestaSuspence = {
+export type RespuestaDecline = {
   data: {
-    motsus: Mesa12[];
+    motrec: Mesa12Decline[];
   };
   flag: boolean;
   msg: string;

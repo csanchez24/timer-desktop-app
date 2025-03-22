@@ -21,29 +21,29 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useSuspensions } from '@/hooks/basics';
-import { useSuspendTask } from '@/hooks/tasks';
+import { useDecline } from '@/hooks/basics';
+import { useDeclineTask } from '@/hooks/tasks';
 import { Mesa02 } from '@/schemas/mesa02';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
 const formSchema = z.object({
-  codsus: z.string(),
+  codigo: z.string(),
   nota: z.string().min(2, {
     message: 'Nota debe ser al menos 2 letras.',
   }),
 });
 
-export function SuspenceForm({ task, onSuccess }: { task?: Mesa02; onSuccess?(): void }) {
+export function DeclineForm({ task, onSuccess }: { task?: Mesa02; onSuccess?(): void }) {
   const navigate = useNavigate();
-  const { data: suspensions } = useSuspensions();
-  const { mutateAsync: suspended, isPending } = useSuspendTask();
+  const { data: declines } = useDecline();
+  const { mutateAsync: decline, isPending } = useDeclineTask();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      codsus: '',
+      codigo: '',
       nota: '',
     },
   });
@@ -52,21 +52,21 @@ export function SuspenceForm({ task, onSuccess }: { task?: Mesa02; onSuccess?():
     async function onSubmit(values: z.infer<typeof formSchema>) {
       try {
         if (!task) return;
-        await suspended({
+        await decline({
           marca: task.marca,
           documento: task.documento,
-          motivo: values.codsus,
+          motivo: values.codigo,
           nota: values.nota,
         });
+        toast('Se rechazo con exito.');
         onSuccess?.();
-        toast('Se suspendio con exito.');
         navigate('/');
       } catch (e) {
-        toast('Error Suspendiendo');
+        toast('Error Rechazando');
         console.log(e);
       }
     },
-    [task, suspended, onSuccess]
+    [task, decline, onSuccess]
   );
 
   return (
@@ -74,7 +74,7 @@ export function SuspenceForm({ task, onSuccess }: { task?: Mesa02; onSuccess?():
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
-          name="codsus"
+          name="codigo"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Motivo</FormLabel>
@@ -85,8 +85,8 @@ export function SuspenceForm({ task, onSuccess }: { task?: Mesa02; onSuccess?():
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {suspensions?.data &&
-                    suspensions.data.motsus.map((sus) => (
+                  {declines?.data &&
+                    declines.data.motrec.map((sus) => (
                       <SelectItem value={sus.codigo}>{sus.detalle_motivo}</SelectItem>
                     ))}
                 </SelectContent>
@@ -110,7 +110,7 @@ export function SuspenceForm({ task, onSuccess }: { task?: Mesa02; onSuccess?():
         />
         <Button disabled={isPending} type="submit">
           {isPending && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
-          Suspender Caso
+          Rechazar Caso
         </Button>
       </form>
     </Form>

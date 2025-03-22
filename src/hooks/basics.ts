@@ -1,6 +1,7 @@
 import { BASEURL } from '@/constants';
 import { RespuestaMesa01 } from '@/schemas/mesa01';
 import { RespuestaSuspence } from '@/schemas/mesa12';
+import { RespuestaDecline } from '@/schemas/mesa12Decline';
 import { RespuestaProjects } from '@/schemas/mesa20';
 import { getSettings } from '@/utils/get-settings';
 import { useQuery } from '@tanstack/react-query';
@@ -21,6 +22,26 @@ export const useMesa01 = () => {
         return null;
       }
       const data = (await res.json()) as RespuestaMesa01;
+      return data;
+    },
+  });
+};
+
+export const useDecline = () => {
+  return useQuery({
+    queryKey: ['declines'],
+    queryFn: async () => {
+      const settings = await getSettings();
+      const res = await fetch(`${BASEURL}/motivosRechazar`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${settings.token}`,
+        },
+      });
+      if (!res.ok) {
+        return null;
+      }
+      const data = (await res.json()) as RespuestaDecline;
       return data;
     },
   });

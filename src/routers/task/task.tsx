@@ -14,6 +14,7 @@ import { createElement, ReactNode } from 'react';
 import { NavLink, useParams } from 'react-router';
 import { SuspenceForm } from './suspence-form';
 import { TaskForm } from './task-form';
+import { DeclineForm } from './decline-form';
 
 function InfoBlock({
   label,
@@ -109,6 +110,23 @@ export default function Task() {
               </SheetHeader>
               <div className="px-4">
                 <SuspenceForm task={task?.data?.mesa02} />
+              </div>
+            </SheetContent>
+          </Sheet>
+
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="destructive">
+                Rechazar <CircleStop />
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="">
+              <SheetHeader>
+                <SheetTitle>Rechazar el Caso</SheetTitle>
+                <SheetDescription>Esta accion rechazara el Caso</SheetDescription>
+              </SheetHeader>
+              <div className="px-4">
+                <DeclineForm task={task?.data?.mesa02} />
               </div>
             </SheetContent>
           </Sheet>

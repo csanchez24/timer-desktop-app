@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { useMesa01 } from '@/hooks/basics';
 import { useTasks } from '@/hooks/tasks';
 import { Mesa02 } from '@/schemas/mesa02';
 import { formatTime } from '@/utils/format-time';
@@ -24,12 +25,12 @@ import { format, formatDistanceToNowStrict } from 'date-fns';
 import { Search } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { NavLink } from 'react-router';
+import { DeclineForm } from '../task/decline-form';
 import { SuspenceForm } from '../task/suspence-form';
 import { TaskForm } from '../task/task-form';
-import { useMesa01 } from '@/hooks/basics';
 
 export default function Tasks() {
-  const { data: tasks, isLoading } = useTasks();
+  const { data: tasks, isLoading, refetch } = useTasks();
   const { data: mesa01 } = useMesa01();
   const { time, isRunning } = useTimer();
 
@@ -37,6 +38,7 @@ export default function Tasks() {
   const [mesa02, setMesa02] = useState<Mesa02>();
   const [openStartTaskDialog, setStartTaskDialog] = useState(false);
   const [openSuspenceTaskDialog, setSuspenceTaskDialog] = useState(false);
+  const [openDeclineTaskDialog, setDeclineTaskDialog] = useState(false);
 
   const [searchText, setSearchText] = useState<string | undefined>('');
   const onSearch = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -184,6 +186,16 @@ export default function Tasks() {
                       >
                         Suspender
                       </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          setMesa02(task);
+                          setDeclineTaskDialog(true);
+                        }}
+                        className="text-red-500"
+                      >
+                        Rechazar
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -201,8 +213,8 @@ export default function Tasks() {
       >
         <SheetContent className="">
           <SheetHeader>
-            <SheetTitle>Arrancar la tarea</SheetTitle>
-            <SheetDescription>Esta accion iniciar la tarea y su tiempo</SheetDescription>
+            <SheetTitle>Arrancar el caso</SheetTitle>
+            <SheetDescription>Esta accion iniciar el caso y su tiempo</SheetDescription>
           </SheetHeader>
           <div className="p-4">
             <TaskForm task={mesa02} />
@@ -219,11 +231,43 @@ export default function Tasks() {
       >
         <SheetContent className="">
           <SheetHeader>
-            <SheetTitle>Suspender la tarea</SheetTitle>
-            <SheetDescription>Esta accion suspendera la tarea</SheetDescription>
+            <SheetTitle>Suspender el caso</SheetTitle>
+            <SheetDescription>Esta accion suspendera el caso</SheetDescription>
           </SheetHeader>
           <div className="p-4">
-            <SuspenceForm task={mesa02} />
+            <SuspenceForm
+              task={mesa02}
+              onSuccess={() => {
+                setMesa02(undefined);
+                setSuspenceTaskDialog(false);
+                refetch();
+              }}
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <Sheet
+        open={openDeclineTaskDialog}
+        onOpenChange={(open) => {
+          setMesa02(undefined);
+          setDeclineTaskDialog(open);
+        }}
+      >
+        <SheetContent className="">
+          <SheetHeader>
+            <SheetTitle>Rechazar el caso</SheetTitle>
+            <SheetDescription>Esta accion rechazara el caso.</SheetDescription>
+          </SheetHeader>
+          <div className="p-4">
+            <DeclineForm
+              task={mesa02}
+              onSuccess={() => {
+                setMesa02(undefined);
+                setDeclineTaskDialog(false);
+                refetch();
+              }}
+            />
           </div>
         </SheetContent>
       </Sheet>
