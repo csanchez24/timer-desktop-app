@@ -31,11 +31,13 @@ const formSchema = z.object({
 export function FinishForm({
   tasks,
   date,
+  timeWorked,
   horini,
   horfin,
   tiempo,
 }: {
   tasks?: DailyTask[];
+  timeWorked: number;
   date: string;
   horini: string;
   horfin: string;
@@ -55,7 +57,7 @@ export function FinishForm({
     async function onSubmit(values: z.infer<typeof formSchema>) {
       try {
         if (!tasks) return;
-        await finishDay({ date, tasks, horini, horfin, tiempo, nota: values.nota });
+        await finishDay({ timeWorked, date, tasks, horini, horfin, tiempo, nota: values.nota });
         toast('Cierre del dia finalizado con exito.');
         const db = await initDB();
         await db.execute('DELETE FROM daily');

@@ -18,9 +18,11 @@ export const useFinishDay = ({
       horfin,
       tiempo,
       nota,
+      timeWorked,
     }: {
       tasks: DailyTask[];
       date: string;
+      timeWorked: number;
       horini: string;
       horfin: string;
       tiempo: string;
@@ -36,6 +38,7 @@ export const useFinishDay = ({
       formData.set('horini', horini);
       formData.set('horfin', horfin);
       formData.set('tiempo', tiempo);
+      formData.set('tiempoTrabajado', formatTime(timeWorked));
       formData.set('nota', nota);
 
       const res = await fetch(`${BASEURL}/cerrarDia`, {

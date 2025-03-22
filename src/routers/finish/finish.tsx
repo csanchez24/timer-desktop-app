@@ -7,6 +7,7 @@ import { useDailyTask } from '@/hooks/daily';
 import { formatTime } from '@/utils/format-time';
 import { useMemo } from 'react';
 import { FinishForm } from './finish-form';
+import { differenceInSeconds, parse } from 'date-fns';
 
 export default function Finish() {
   const { data, isLoading, refetch } = useDailyTask();
@@ -32,6 +33,13 @@ export default function Finish() {
 
     return formatTime(total);
   }, [data]);
+
+  const timeWorked = useMemo(() => {
+    if (!startTime || !endTime) return 0;
+    const time1 = parse(startTime, 'HH:mm:ss', new Date());
+    const time2 = parse(endTime, 'HH:mm:ss', new Date());
+    return differenceInSeconds(time2, time1);
+  }, [startTime, endTime]);
 
   const markedChecked = async (checked: boolean, numero: number) => {
     const db = await initDB();
@@ -99,6 +107,7 @@ export default function Finish() {
       <div>
         <FinishForm
           tasks={data ?? []}
+          timeWorked={timeWorked ?? 0}
           date={date ?? ''}
           horini={startTime ?? ''}
           horfin={endTime ?? ''}
