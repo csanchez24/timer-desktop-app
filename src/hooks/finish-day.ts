@@ -30,7 +30,7 @@ export const useFinishDay = ({
       formData.set('horfin', horfin);
       formData.set('tiempo', tiempo);
       formData.set('nota', nota);
-      const res = await fetch(`${BASEURL}/finishDay`, {
+      const res = await fetch(`${BASEURL}/cerrarDia`, {
         method: 'POST',
         body: formData,
         headers: {
@@ -44,7 +44,6 @@ export const useFinishDay = ({
       return data;
     },
     async onSuccess() {
-      toast('bien', { description: 'bien' });
       onSuccess?.();
     },
     onError(e) {

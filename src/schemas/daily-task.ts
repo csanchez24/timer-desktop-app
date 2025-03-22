@@ -10,4 +10,7 @@ export type DailyTask = {
   nota: string; // TEXT, a long string
   tiempo?: string; // CHAR(6), nullable, time format "HH:MM"
   cerrar: 'S' | 'N'; // ENUM, only 'S' or 'N'
+  area: string; // CHAR(2), UTF-8 encoded
+  usuario: string; // CHAR(2), UTF-8 encoded
+  descripcion: string; // CHAR(2), UTF-8 encoded
 };

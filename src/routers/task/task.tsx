@@ -8,7 +8,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
-import { db } from '@/db';
+import { initDB } from '@/db';
 import { useTask } from '@/hooks/tasks';
 import { DailyTask } from '@/schemas/daily-task';
 import { ArrowLeft, CircleStop, Play } from 'lucide-react';
@@ -43,6 +43,7 @@ export default function Task() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const db = await initDB();
         const res = (await db.select(
           'SELECT * FROM daily WHERE marca=$1 AND documento=$2 AND horfin IS NULL',
           [task?.data?.mesa02?.marca, task?.data?.mesa02?.documento]
@@ -72,7 +73,7 @@ export default function Task() {
     { label: 'Usuario', value: task?.data?.mesa02.usuario_mesa },
     { label: 'Area', value: task?.data?.mesa02.codigo_area },
     { label: 'SubArea', value: task?.data?.mesa02.codigo_proyecto },
-    { label: 'Modalidad', value: task?.data?.mesa02.codigo_modulo },
+    { label: 'Modulo', value: task?.data?.mesa02.codigo_modulo },
     { label: 'Accion', value: task?.data?.mesa02.accion_solicitada },
     { label: 'Nivel', value: task?.data?.mesa02.nivel_importancia },
     { label: 'Hora Extra', value: task?.data?.mesa02.horas_extras },
@@ -82,7 +83,7 @@ export default function Task() {
     { label: 'Motivo Garantia', value: task?.data?.mesa02.motivo_garantia },
     { label: 'Archivo', value: Link },
     { label: 'Responsable', value: task?.data.mesa02.usuario_responsable },
-    { label: 'Timpo Estimado', value: task?.data?.mesa02.tiempo_estimado },
+    { label: 'Tiempo Estimado', value: task?.data?.mesa02.tiempo_estimado },
     { label: 'Descripcion', value: task?.data?.mesa02.descripcion },
   ];
 

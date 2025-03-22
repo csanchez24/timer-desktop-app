@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import SettingForm from './form';
-import { db } from '@/db';
+import { initDB } from '@/db';
 import type { Settings } from '@/schemas/settings';
 
 export default function SettingsPage() {
@@ -9,6 +9,7 @@ export default function SettingsPage() {
   useEffect(() => {
     async function fetchSettings() {
       try {
+        const db = await initDB();
         const [result] = (await db.select('SELECT * FROM settings')) as Settings[];
         if (result) {
           setSettings(result);

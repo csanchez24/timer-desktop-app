@@ -46,6 +46,9 @@ export function TaskForm({ task }: { task?: Mesa02 }) {
           documento: task.documento,
           estado: task.estado,
           nota: values.nota,
+          area: task.codigo_area,
+          usuario: task.usuario_mesa,
+          descripcion: task.descripcion,
         });
         navigate('/daily');
         return;

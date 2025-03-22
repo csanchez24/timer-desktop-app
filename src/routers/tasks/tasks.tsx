@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { db } from '@/db';
+import { initDB } from '@/db';
 import { useTasks } from '@/hooks/tasks';
 import { DailyTask } from '@/schemas/daily-task';
 import { Mesa02 } from '@/schemas/mesa02';
@@ -63,6 +63,7 @@ export default function Tasks() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const db = await initDB();
         const res = (await db.select('SELECT * FROM daily WHERE horfin IS NULL')) as DailyTask[];
         setDailyTask(res.at(0));
       } catch (err) {

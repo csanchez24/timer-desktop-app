@@ -10,7 +10,7 @@ export const useTasks = () => {
     queryKey: ['tasks'],
     queryFn: async () => {
       const settings = await getSettings();
-      const res = await fetch(`${BASEURL}/casosUsuario`, {
+      const res = await fetch(`${BASEURL}/casos`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${settings.token}`,
@@ -35,7 +35,7 @@ export const useTask = (marca?: string, documento?: string) => {
       formData.set('marca', marca ?? '');
       formData.set('documento', documento ?? '');
 
-      const res = await fetch(`${BASEURL}/mesa02`, {
+      const res = await fetch(`${BASEURL}/caso`, {
         method: 'POST',
         body: formData,
         headers: {
@@ -101,11 +101,11 @@ export const useAutoTask = ({
   onError,
 }: { onSuccess?(): void; onError?(): void } = {}) => {
   return useMutation({
-    mutationFn: async ({ subare, note }: { subare: string; note: string }) => {
+    mutationFn: async ({ subare, nota }: { subare: string; nota: string }) => {
       const settings = await getSettings();
       const formData = new FormData();
       formData.set('subarea', subare ?? '');
-      formData.set('note', note ?? '');
+      formData.set('note', nota ?? '');
       const res = await fetch(`${BASEURL}/autogestionCaso`, {
         method: 'POST',
         body: formData,
@@ -120,7 +120,6 @@ export const useAutoTask = ({
       return data;
     },
     async onSuccess() {
-      toast('bien', { description: 'bien' });
       onSuccess?.();
     },
     onError(e) {

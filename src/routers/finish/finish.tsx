@@ -1,12 +1,11 @@
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import { db } from '@/db';
+import { Switch } from '@/components/ui/switch';
+import { initDB } from '@/db';
 import { DailyTask } from '@/schemas/daily-task';
+import { formatTime } from '@/utils/format-time';
 import { useEffect, useMemo, useState } from 'react';
 import { FinishForm } from './finish-form';
-import { Switch } from '@/components/ui/switch';
-import { formatTime } from '@/utils/format-time';
-import { differenceInSeconds } from 'date-fns';
 
 export default function Finish() {
   const [data, setData] = useState<DailyTask[]>([]);
@@ -16,6 +15,7 @@ export default function Finish() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const db = await initDB();
         const res = (await db.select('SELECT * FROM daily ORDER BY numero ASC')) as DailyTask[];
         setData(res);
         setRefetch(false);
@@ -49,6 +49,7 @@ export default function Finish() {
   }, [data]);
 
   const markedChecked = async (checked: boolean, numero: number) => {
+    const db = await initDB();
     await db.execute('UPDATE daily SET cerrar = ? WHERE numero = ?', [checked ? 'S' : 'N', numero]);
     setRefetch(true);
     return;

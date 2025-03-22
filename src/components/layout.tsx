@@ -1,4 +1,4 @@
-import { CalendarCheck, NotebookPen, NotebookTabs, UserCog } from 'lucide-react';
+import { NotebookPen, NotebookTabs, UserCog } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router';
 
 export default function Layout() {

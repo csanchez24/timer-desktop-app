@@ -34,7 +34,10 @@ pub fn run() {
                 horfin TEXT,
                 nota TEXT NOT NULL,
                 tiempo TEXT,
-                cerrar TEXT NOT NULL
+                cerrar TEXT NOT NULL,
+                area TEXT NOT NULL,
+                usuario TEXT NOT NULL,
+                descripcion TEXT NOT NULL
             );
         "#,
             kind: MigrationKind::Up,

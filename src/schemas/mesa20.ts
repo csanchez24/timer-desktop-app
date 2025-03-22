@@ -1,6 +1,6 @@
 export type Mesa20 = {
-  codigo_proyecto: string;
-  detalle_proyecto: string;
+  codigo_subarea: string;
+  detalle_subarea: string;
 };
 
 export type RespuestaProjects = {

@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -12,8 +13,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Textarea } from '@/components/ui/textarea';
-import { useProjects } from '@/hooks/basics';
 import {
   Select,
   SelectContent,
@@ -21,6 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { useProjects } from '@/hooks/basics';
+import { useAutoTask } from '@/hooks/tasks';
+import { useCallback } from 'react';
+import { toast } from 'sonner';
 
 const formSchema = z.object({
   subare: z.string(),
@@ -29,8 +33,12 @@ const formSchema = z.object({
   }),
 });
 
-export function AutoGestionForm() {
+export function AutoGestionForm({
+  onSuccess,
+  onError,
+}: { onSuccess?(): void; onError?(): void } = {}) {
   const { data: projects } = useProjects();
+  const { mutateAsync: create, isPending } = useAutoTask();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -40,11 +48,23 @@ export function AutoGestionForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-  }
+  const onSubmit = useCallback(
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+      try {
+        await create({
+          subare: values.subare,
+          nota: values.nota,
+        });
+        onSuccess?.();
+        toast('Se creo caso con exito.');
+      } catch (e) {
+        onError?.();
+        toast('Error creando caso');
+        console.log(e);
+      }
+    },
+    [, create, toast]
+  );
 
   return (
     <Form {...form}>
@@ -57,14 +77,14 @@ export function AutoGestionForm() {
               <FormLabel>Projecto</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select" />
+                  <SelectTrigger className="w-full max-w-[350px]">
+                    <SelectValue placeholder="Seleccione un projecto" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   {projects?.data &&
                     projects.data.codpro.map((pro) => (
-                      <SelectItem value={pro.codigo_proyecto}>{pro.detalle_proyecto}</SelectItem>
+                      <SelectItem value={pro.codigo_subarea}>{pro.detalle_subarea}</SelectItem>
                     ))}
                 </SelectContent>
               </Select>
@@ -85,7 +105,10 @@ export function AutoGestionForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">Suspender</Button>
+        <Button type="submit">
+          {isPending && <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />}
+          Crear Caso
+        </Button>
       </form>
     </Form>
   );

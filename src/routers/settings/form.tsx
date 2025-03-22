@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { db } from '@/db';
+import { initDB } from '@/db';
 import { Settings } from '@/schemas/settings';
 import { toast } from 'sonner';
 import { useCallback } from 'react';
@@ -40,6 +40,7 @@ export default function SettingForm({
 
   const onSubmit = useCallback(
     async function onSubmit(values: z.infer<typeof formSchema>) {
+      const db = await initDB();
       if (!settings) {
         await db.execute('INSERT INTO settings (token) VALUES ($1)', [values.token]);
       } else {
@@ -48,7 +49,7 @@ export default function SettingForm({
       onSave?.(values);
       toast('se actualizo con exito.');
     },
-    [toast, db, settings, onSave]
+    [toast, initDB, settings, onSave]
   );
 
   return (

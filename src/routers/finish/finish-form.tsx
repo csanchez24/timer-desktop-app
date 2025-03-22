@@ -14,7 +14,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
-import { db } from '@/db';
+import { initDB } from '@/db';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { useFinishDay } from '@/hooks/finish-day';
@@ -52,6 +52,7 @@ export function FinishForm({
       try {
         if (!tasks) return;
         await finishDay({ tasks, horini, horfin, tiempo, nota: values.nota });
+        const db = await initDB();
         await db.execute('DELETE FROM daily');
         return;
       } catch (e) {

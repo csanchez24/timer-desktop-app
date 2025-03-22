@@ -1,3 +1,5 @@
 import Database from '@tauri-apps/plugin-sql';
 
-export const db = await Database.load('sqlite:timer.db');
+export async function initDB() {
+  return await Database.load('sqlite:timer.db');
+}

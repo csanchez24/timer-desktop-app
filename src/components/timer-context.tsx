@@ -1,4 +1,4 @@
-import { db } from '@/db';
+import { initDB } from '@/db';
 import { DailyTask } from '@/schemas/daily-task';
 import { getDate } from '@/utils/get-date';
 import { getTime } from '@/utils/get-time';
@@ -13,11 +13,17 @@ interface TimerContextType {
     documento,
     estado,
     nota,
+    area,
+    usuario,
+    descripcion,
   }: {
     marca: string;
     documento: string;
     estado: string;
     nota: string;
+    area: string;
+    usuario: string;
+    descripcion: string;
   }) => Promise<void>;
   pauseTimer: () => Promise<void>;
 }
@@ -31,6 +37,7 @@ export const TimerProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const db = await initDB();
         const [res] = (await db.select('SELECT * FROM daily WHERE horfin is null')) as DailyTask[];
         if (res) {
           const now = new Date();
@@ -76,12 +83,19 @@ export const TimerProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     documento,
     nota,
     estado,
+    area,
+    usuario,
+    descripcion,
   }: {
     marca: string;
     documento: string;
     estado: string;
     nota: string;
+    area: string;
+    usuario: string;
+    descripcion: string;
   }) => {
+    const db = await initDB();
     const finalTime = getTime();
     await db.execute('UPDATE daily SET horfin=$1,tiempo=$2 WHERE horfin is null', [
       finalTime,
@@ -89,13 +103,14 @@ export const TimerProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     ]);
     const date = getDate();
     await db.execute(
-      'INSERT into daily (fecha, marca,documento,estado,estnue,horini,nota,tiempo,cerrar) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
-      [date, marca, documento, estado, 'E', finalTime, nota, 0, 'N']
+      'INSERT into daily (fecha, marca,documento,estado,estnue,horini,nota,tiempo,cerrar,area,usuario,descripcion) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,$10,$11,$12)',
+      [date, marca, documento, estado, 'E', finalTime, nota, 0, 'N', area, usuario, descripcion]
     );
     setTime(0);
     setIsRunning(true);
   };
   const pauseTimer = async () => {
+    const db = await initDB();
     const finalTime = getTime();
     await db.execute('UPDATE daily SET horfin=$1,tiempo=$2 WHERE horfin is null', [
       finalTime,
