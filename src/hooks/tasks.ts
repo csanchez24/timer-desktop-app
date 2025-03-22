@@ -1,5 +1,5 @@
 import { BASEURL } from '@/constants';
-import { RespuestaTask, RespuestaTasks } from '@/schemas/mesa02';
+import { Mesa02, RespuestaTask, RespuestaTasks } from '@/schemas/mesa02';
 import { getSettings } from '@/utils/get-settings';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { fetch } from '@tauri-apps/plugin-http';
@@ -150,7 +150,7 @@ export const useAutoTask = ({
       const settings = await getSettings();
       const formData = new FormData();
       formData.set('subarea', subare ?? '');
-      formData.set('note', nota ?? '');
+      formData.set('nota', nota ?? '');
       const res = await fetch(`${BASEURL}/autogestionCaso`, {
         method: 'POST',
         body: formData,
@@ -161,7 +161,7 @@ export const useAutoTask = ({
       if (!res.ok) {
         return null;
       }
-      const data = await res.json();
+      const data = (await res.json()) as Mesa02;
       return data;
     },
     async onSuccess() {

@@ -4,6 +4,7 @@ import { fetch } from '@tauri-apps/plugin-http';
 import { DailyTask } from '@/schemas/daily-task';
 import { BASEURL } from '@/constants';
 import { getSettings } from '@/utils/get-settings';
+import { formatTime } from '@/utils/format-time';
 
 export const useFinishDay = ({
   onSuccess,
@@ -28,7 +29,8 @@ export const useFinishDay = ({
       formData.set('tasks', JSON.stringify(tasks));
       formData.set('horini', horini);
       formData.set('horfin', horfin);
-      formData.set('tiempo', tiempo);
+      formData.set('tiempo_sec', tiempo);
+      formData.set('tiempo', formatTime(parseInt(tiempo)));
       formData.set('nota', nota);
       const res = await fetch(`${BASEURL}/cerrarDia`, {
         method: 'POST',

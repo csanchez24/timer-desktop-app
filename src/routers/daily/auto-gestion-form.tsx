@@ -25,6 +25,7 @@ import { useProjects } from '@/hooks/basics';
 import { useAutoTask } from '@/hooks/tasks';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
+import { useTimer } from '@/components/timer-context';
 
 const formSchema = z.object({
   subare: z.string(),
@@ -39,6 +40,7 @@ export function AutoGestionForm({
 }: { onSuccess?(): void; onError?(): void } = {}) {
   const { data: projects } = useProjects();
   const { mutateAsync: create, isPending } = useAutoTask();
+  const { startTimer } = useTimer();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -51,9 +53,22 @@ export function AutoGestionForm({
   const onSubmit = useCallback(
     async function onSubmit(values: z.infer<typeof formSchema>) {
       try {
-        await create({
+        const task = await create({
           subare: values.subare,
           nota: values.nota,
+        });
+        if (!task) {
+          toast('Error creando caso');
+          return;
+        }
+        startTimer({
+          marca: task?.marca ?? '',
+          documento: task?.documento ?? '',
+          estado: 'E',
+          nota: values.nota,
+          area: task?.codigo_area ?? '',
+          descripcion: task?.descripcion ?? '',
+          usuario: task?.usuario_mesa ?? '',
         });
         onSuccess?.();
         toast('Se creo caso con exito.');
@@ -63,7 +78,7 @@ export function AutoGestionForm({
         console.log(e);
       }
     },
-    [, create, toast]
+    [startTimer, create, toast]
   );
 
   return (
