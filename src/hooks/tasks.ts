@@ -1,5 +1,6 @@
 import { BASEURL } from '@/constants';
 import { Mesa02, RespuestaTask, RespuestaTasks } from '@/schemas/mesa02';
+import { formatTime } from '@/utils/format-time';
 import { getSettings } from '@/utils/get-settings';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { fetch } from '@tauri-apps/plugin-http';
@@ -163,6 +164,49 @@ export const useAutoTask = ({
       }
       const data = (await res.json()) as { caso: Mesa02 };
       return data.caso;
+    },
+    async onSuccess() {
+      onSuccess?.();
+    },
+    onError(e) {
+      toast('mal', { description: e.message });
+      onError?.();
+    },
+  });
+};
+
+export const usePresuTask = ({
+  onSuccess,
+  onError,
+}: { onSuccess?(): void; onError?(): void } = {}) => {
+  return useMutation({
+    mutationFn: async ({
+      marca,
+      documento,
+      tiempo,
+    }: {
+      marca: string;
+      documento: string;
+      tiempo: number;
+    }) => {
+      const settings = await getSettings();
+      const formData = new FormData();
+      formData.set('marca', marca ?? '');
+      formData.set('documento', documento ?? '');
+      formData.set('tiempo', formatTime(tiempo * 60, false));
+
+      const res = await fetch(`${BASEURL}/presupuestarCaso`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${settings.token}`,
+        },
+      });
+      if (!res.ok) {
+        throw new Error();
+      }
+      const data = await res.json();
+      return data;
     },
     async onSuccess() {
       onSuccess?.();

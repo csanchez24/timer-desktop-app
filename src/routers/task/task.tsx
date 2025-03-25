@@ -63,6 +63,8 @@ export default function Task() {
     { label: 'Archivo', value: Link },
     { label: 'Responsable', value: task?.data.mesa02.usuario_responsable },
     { label: 'Tiempo Estimado', value: task?.data?.mesa02.tiempo_estimado },
+    { label: 'Tiempo Acumulado', value: task?.data?.mesa02.tiempo_acumulado },
+    { label: 'Aprueba Tiempo ?', value: task?.data?.mesa02.aprueba_tiempo },
     { label: 'Descripcion', value: task?.data?.mesa02.descripcion },
   ];
 
@@ -97,39 +99,43 @@ export default function Task() {
             </SheetContent>
           </Sheet>
 
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="destructive">
-                Suspender <CircleStop />
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="">
-              <SheetHeader>
-                <SheetTitle>Suspender el Caso</SheetTitle>
-                <SheetDescription>Esta accion suspendera el Caso</SheetDescription>
-              </SheetHeader>
-              <div className="px-4">
-                <SuspenceForm task={task?.data?.mesa02} />
-              </div>
-            </SheetContent>
-          </Sheet>
+          {task?.data?.mesa02?.estado === 'ASIGNADO' && (
+            <>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="destructive">
+                    Suspender <CircleStop />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="">
+                  <SheetHeader>
+                    <SheetTitle>Suspender el Caso</SheetTitle>
+                    <SheetDescription>Esta accion suspendera el Caso</SheetDescription>
+                  </SheetHeader>
+                  <div className="px-4">
+                    <SuspenceForm task={task?.data?.mesa02} />
+                  </div>
+                </SheetContent>
+              </Sheet>
 
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="destructive">
-                Rechazar <CircleStop />
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="">
-              <SheetHeader>
-                <SheetTitle>Rechazar el Caso</SheetTitle>
-                <SheetDescription>Esta accion rechazara el Caso</SheetDescription>
-              </SheetHeader>
-              <div className="px-4">
-                <DeclineForm task={task?.data?.mesa02} />
-              </div>
-            </SheetContent>
-          </Sheet>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="destructive">
+                    Rechazar <CircleStop />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="">
+                  <SheetHeader>
+                    <SheetTitle>Rechazar el Caso</SheetTitle>
+                    <SheetDescription>Esta accion rechazara el Caso</SheetDescription>
+                  </SheetHeader>
+                  <div className="px-4">
+                    <DeclineForm task={task?.data?.mesa02} />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </>
+          )}
         </div>
       </div>
 

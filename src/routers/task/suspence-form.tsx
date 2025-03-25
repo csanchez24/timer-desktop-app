@@ -29,7 +29,7 @@ import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
 const formSchema = z.object({
-  codsus: z.string(),
+  codsus: z.string().min(1, { message: 'Seleccione un Motivo' }),
   nota: z.string().min(2, {
     message: 'Nota debe ser al menos 2 letras.',
   }),

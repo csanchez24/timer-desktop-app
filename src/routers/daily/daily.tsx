@@ -85,7 +85,7 @@ export default function Daily() {
     <div className="container">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h1 className="text-lg">Tarea Activa</h1>
+          <h1 className="text-lg">Caso Activo</h1>
         </div>
         <div className="flex gap-3">
           <Sheet open={openedAutoDialog} onOpenChange={handleAutoDialogChange}>
@@ -166,6 +166,8 @@ export default function Daily() {
                     </TooltipProvider>
                   </p>
                   <p>{daily.nota}</p>
+                  {daily.tiempo_estimado && <p className="">Estimado: {daily.tiempo_estimado}</p>}
+                  <p className="mb-2">Acumulado: {daily.tiempo_acumulado}</p>
                 </div>
                 <div className="text-secondary text-sm font-bold">{formatTime(time)}</div>
               </div>
@@ -173,7 +175,7 @@ export default function Daily() {
           ))}
       </div>
       <div>
-        <h2 className="mb-4 text-lg">Tareas Inactivas</h2>
+        <h2 className="mb-4 text-lg">Casos Inactivos</h2>
         <div className="flex flex-col gap-3">
           {data
             ?.filter((d) => d.horfin)
@@ -200,6 +202,8 @@ export default function Daily() {
                       </TooltipProvider>
                     </p>
                     <p>{daily.nota}</p>
+                    {daily.tiempo_estimado && <p className="">Estimado: {daily.tiempo_estimado}</p>}
+                    <p className="mb-2">Acumulado: {daily.tiempo_acumulado}</p>
                   </div>
                   <div className="text-secondary flex items-center text-sm font-bold">
                     <div className="text-secondary text-sm font-bold">

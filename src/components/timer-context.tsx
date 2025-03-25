@@ -17,6 +17,9 @@ interface TimerContextType {
     area,
     usuario,
     descripcion,
+    cerrar,
+    tiempoAcumulado,
+    tiempoEstimado,
   }: {
     marca: string;
     documento: string;
@@ -25,6 +28,9 @@ interface TimerContextType {
     area: string;
     usuario: string;
     descripcion: string;
+    cerrar?: 'S' | 'N';
+    tiempoAcumulado: string;
+    tiempoEstimado?: string;
   }) => Promise<void>;
   pauseTimer: () => Promise<void>;
 }
@@ -100,6 +106,9 @@ export const TimerProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     area,
     usuario,
     descripcion,
+    cerrar = 'N',
+    tiempoEstimado,
+    tiempoAcumulado,
   }: {
     marca: string;
     documento: string;
@@ -108,6 +117,9 @@ export const TimerProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     area: string;
     usuario: string;
     descripcion: string;
+    cerrar?: 'S' | 'N';
+    tiempoAcumulado: string;
+    tiempoEstimado?: string;
   }) => {
     const db = await initDB();
     const finalTime = getTime();
@@ -117,8 +129,23 @@ export const TimerProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     ]);
     const date = getDate();
     await db.execute(
-      'INSERT into daily (fecha, marca,documento,estado,estnue,horini,nota,tiempo,cerrar,area,usuario,descripcion) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,$10,$11,$12)',
-      [date, marca, documento, estado, 'E', finalTime, nota, 0, 'N', area, usuario, descripcion]
+      'INSERT into daily (fecha, marca,documento,estado,estnue,horini,nota,tiempo,cerrar,area,usuario,descripcion,tiempo_acumulado,tiempo_estimado) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,$10,$11,$12,$13,$14)',
+      [
+        date,
+        marca,
+        documento,
+        estado,
+        'E',
+        finalTime,
+        nota,
+        0,
+        cerrar,
+        area,
+        usuario,
+        descripcion,
+        tiempoAcumulado,
+        tiempoEstimado,
+      ]
     );
     setTime(0);
     setIsRunning(true);

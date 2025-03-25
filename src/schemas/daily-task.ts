@@ -13,4 +13,6 @@ export type DailyTask = {
   area: string; // CHAR(2), UTF-8 encoded
   usuario: string; // CHAR(2), UTF-8 encoded
   descripcion: string; // CHAR(2), UTF-8 encoded
+  tiempo_acumulado: string;
+  tiempo_estimado?: string;
 };

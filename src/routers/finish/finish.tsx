@@ -83,7 +83,9 @@ export default function Finish() {
                     </Tooltip>
                   </TooltipProvider>
                 </p>
-                <p className="mb-2">{daily.nota}</p>
+                <p className="mb-2">Nota: {daily.nota}</p>
+                {daily.tiempo_estimado && <p className="">Estimado: {daily.tiempo_estimado}</p>}
+                <p className="mb-2">Acumulado: {daily.tiempo_acumulado}</p>
                 <div className="flex items-center space-x-2">
                   <Switch
                     checked={daily.cerrar === 'S'}

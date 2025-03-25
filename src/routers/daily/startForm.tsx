@@ -48,6 +48,8 @@ export function StartForm({ task, onSuccess }: { task?: DailyTask; onSuccess?():
           area: task.area,
           usuario: task.usuario,
           descripcion: task.descripcion,
+          tiempoAcumulado: task.tiempo_acumulado,
+          tiempoEstimado: task.tiempo_estimado,
         });
         onSuccess?.();
         return;

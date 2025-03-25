@@ -28,7 +28,7 @@ import { useCallback } from 'react';
 import { toast } from 'sonner';
 
 const formSchema = z.object({
-  subare: z.string(),
+  subare: z.string().min(1, { message: 'Seleccione un Motivo' }),
   nota: z.string().min(2, {
     message: 'Nota debe ser al menos 2 letras.',
   }),
@@ -65,6 +65,9 @@ export function AutoGestionForm({
           area: task?.codigo_area ?? '',
           descripcion: task?.descripcion ?? '',
           usuario: task?.usuario_mesa ?? '',
+          cerrar: 'S',
+          tiempoAcumulado: task?.tiempo_acumulado ?? '',
+          tiempoEstimado: task?.tiempo_estimado,
         });
         onSuccess?.();
         toast('Se creo caso con exito.');

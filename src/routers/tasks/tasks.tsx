@@ -27,6 +27,7 @@ import { NavLink } from 'react-router';
 import { DeclineForm } from '../task/decline-form';
 import { SuspenceForm } from '../task/suspence-form';
 import { TaskForm } from '../task/task-form';
+import { PresuForm } from '../task/presu-form';
 
 export default function Tasks() {
   const { data: tasks, isLoading, refetch } = useTasks();
@@ -37,6 +38,7 @@ export default function Tasks() {
   const [openStartTaskDialog, setStartTaskDialog] = useState(false);
   const [openSuspenceTaskDialog, setSuspenceTaskDialog] = useState(false);
   const [openDeclineTaskDialog, setDeclineTaskDialog] = useState(false);
+  const [openPresuTaskDialog, setPresuTaskDialog] = useState(false);
 
   const [searchText, setSearchText] = useState<string | undefined>('');
   const onSearch = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,6 +47,17 @@ export default function Tasks() {
 
   const filterTasks = useMemo(() => {
     if (!searchText && !toggle) return tasks?.data.casusu;
+
+    if (toggle === 'presupuestar') {
+      return tasks?.data.casusu.filter((task) => {
+        const textFilter = searchText
+          ? task.marca.toLowerCase().includes(searchText.toLowerCase()) ||
+            task.documento.toLowerCase().includes(searchText.toLowerCase()) ||
+            task.descripcion.toLowerCase().includes(searchText.toLowerCase())
+          : true;
+        return task.aprueba_tiempo === 'S' && textFilter && !task.tiempo_estimado;
+      });
+    }
 
     return tasks?.data.casusu.filter((task) => {
       const textFilter = searchText
@@ -119,6 +132,14 @@ export default function Tasks() {
                 {tasks?.data?.casusu?.filter((task) => task.marca === 'SS').length ?? 0}
               </Badge>
             </ToggleGroupItem>
+            <ToggleGroupItem value="presupuestar" aria-label="Toggle underline">
+              Presupuestar
+              <Badge variant="default">
+                {tasks?.data?.casusu?.filter(
+                  (task) => task.aprueba_tiempo === 'S' && !task.tiempo_estimado
+                ).length ?? 0}
+              </Badge>
+            </ToggleGroupItem>
           </ToggleGroup>
         </div>
         {isLoading && (
@@ -161,36 +182,52 @@ export default function Tasks() {
                       <Icons.EllipsisVertical />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                      <DropdownMenuItem
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          setMesa02(task);
-                          setStartTaskDialog(true);
-                        }}
-                      >
-                        Iniciar
-                      </DropdownMenuItem>
+                      {task.aprueba_tiempo === 'S' && !task.tiempo_estimado ? (
+                        <DropdownMenuItem
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            setMesa02(task);
+                            setPresuTaskDialog(true);
+                          }}
+                        >
+                          Presupuestar
+                        </DropdownMenuItem>
+                      ) : (
+                        <DropdownMenuItem
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            setMesa02(task);
+                            setStartTaskDialog(true);
+                          }}
+                        >
+                          Iniciar
+                        </DropdownMenuItem>
+                      )}
 
-                      <DropdownMenuItem
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          setMesa02(task);
-                          setSuspenceTaskDialog(true);
-                        }}
-                        className="text-red-500"
-                      >
-                        Suspender
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          setMesa02(task);
-                          setDeclineTaskDialog(true);
-                        }}
-                        className="text-red-500"
-                      >
-                        Rechazar
-                      </DropdownMenuItem>
+                      {task.estado === 'ASIGNADO' && (
+                        <>
+                          <DropdownMenuItem
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              setMesa02(task);
+                              setSuspenceTaskDialog(true);
+                            }}
+                            className="text-red-500"
+                          >
+                            Suspender
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              setMesa02(task);
+                              setDeclineTaskDialog(true);
+                            }}
+                            className="text-red-500"
+                          >
+                            Rechazar
+                          </DropdownMenuItem>
+                        </>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -235,6 +272,31 @@ export default function Tasks() {
               onSuccess={() => {
                 setMesa02(undefined);
                 setSuspenceTaskDialog(false);
+                refetch();
+              }}
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <Sheet
+        open={openPresuTaskDialog}
+        onOpenChange={(open) => {
+          setMesa02(undefined);
+          setPresuTaskDialog(open);
+        }}
+      >
+        <SheetContent className="">
+          <SheetHeader>
+            <SheetTitle>Presupuestar el caso</SheetTitle>
+            <SheetDescription>Esta accion presupuestara el caso</SheetDescription>
+          </SheetHeader>
+          <div className="p-4">
+            <PresuForm
+              task={mesa02}
+              onSuccess={() => {
+                setMesa02(undefined);
+                setPresuTaskDialog(false);
                 refetch();
               }}
             />

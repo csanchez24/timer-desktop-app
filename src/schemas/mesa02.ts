@@ -20,10 +20,13 @@ export type Mesa02 = {
   archivo_adjunto: string | null;
   usuario_responsable: string;
   tiempo: string | null;
-  tiempo_estimado: string | null;
   minutos_soporte: string;
   valor_soporte: string;
   valor_cobro: string;
+  aprueba_tiempo: 'S' | 'N';
+  tiempo_presupuestado?: string;
+  tiempo_acumulado: string;
+  tiempo_estimado?: string;
 };
 
 export type RespuestaTasks = {
