@@ -19,12 +19,12 @@ export default function Finish() {
 
   const startTime = useMemo(() => {
     if (!data) return;
-    return data.at(0)?.horini;
+    return data.at(-1)?.horini;
   }, [data]);
 
   const endTime = useMemo(() => {
     if (!data) return;
-    return data.at(-1)?.horfin;
+    return data.at(0)?.horfin;
   }, [data]);
 
   const time = useMemo(() => {

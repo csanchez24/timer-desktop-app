@@ -11,6 +11,7 @@ use tauri::{
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    macos_app_nap::prevent();
     // Define database migrations
     let migrations = vec![
         Migration {

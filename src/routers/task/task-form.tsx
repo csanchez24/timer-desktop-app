@@ -44,7 +44,7 @@ export function TaskForm({ task }: { task?: Mesa02 }) {
         await startTimer({
           marca: task.marca,
           documento: task.documento,
-          estado: task.estado,
+          estado: task.estado === 'EN PROCESO' ? 'E' : 'A',
           nota: values.nota,
           area: task.codigo_area,
           usuario: task.usuario_mesa,

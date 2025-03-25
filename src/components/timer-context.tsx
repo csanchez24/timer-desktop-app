@@ -4,6 +4,7 @@ import { getDate } from '@/utils/get-date';
 import { getTime } from '@/utils/get-time';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { differenceInSeconds } from 'date-fns';
+import { listen } from '@tauri-apps/api/event';
 
 interface TimerContextType {
   time: number;
@@ -33,6 +34,16 @@ export const TimerContext = createContext<TimerContextType | undefined>(undefine
 export const TimerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [time, setTime] = useState<number>(0);
   const [isRunning, setIsRunning] = useState<boolean>(false);
+  const [refresh, setRefresh] = useState<boolean>(true);
+
+  useEffect(() => {
+    const unlisten = listen('tauri://focus', () => {
+      setRefresh(true);
+    });
+    return () => {
+      unlisten.then((fn) => fn());
+    };
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,14 +64,17 @@ export const TimerProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           const diffSeconds = differenceInSeconds(now, pastTime);
           setTime(diffSeconds > 0 ? diffSeconds : 0);
           setIsRunning(true);
+          setRefresh(false);
         }
       } catch (err) {
         console.log(err);
       }
     };
 
-    fetchData();
-  }, []);
+    if (refresh) {
+      fetchData();
+    }
+  }, [refresh]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined;
@@ -126,7 +140,6 @@ export const TimerProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   );
 };
 
-// Custom hook to use the timer in any component
 export const useTimer = (): TimerContextType => {
   const context = useContext(TimerContext);
   if (!context) {
