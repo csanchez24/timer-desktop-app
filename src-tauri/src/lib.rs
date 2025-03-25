@@ -38,7 +38,9 @@ pub fn run() {
                 cerrar TEXT NOT NULL,
                 area TEXT NOT NULL,
                 usuario TEXT NOT NULL,
-                descripcion TEXT NOT NULL
+                descripcion TEXT NOT NULL,
+                tiempo_acumulado TEXT NOT NULL,
+                tiempo_estimado TEXT
             );
         "#,
             kind: MigrationKind::Up,
