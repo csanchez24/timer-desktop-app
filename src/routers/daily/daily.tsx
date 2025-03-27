@@ -205,12 +205,12 @@ export default function Daily() {
                     {daily.tiempo_estimado && <p className="">Estimado: {daily.tiempo_estimado}</p>}
                     <p className="mb-2">Acumulado: {daily.tiempo_acumulado}</p>
                   </div>
-                  <div className="text-secondary flex items-center text-sm font-bold">
+                  <div className="text-secondary flex items-center gap-2 text-sm font-bold">
                     <div className="text-secondary text-sm font-bold">
                       {formatTime(parseInt(daily.tiempo ?? '0'))}
                     </div>
                     <Button variant="ghost" onClick={() => onStartTime(daily)}>
-                      <Play className="text-black" />
+                      <Play className="" />
                     </Button>
                   </div>
                 </div>

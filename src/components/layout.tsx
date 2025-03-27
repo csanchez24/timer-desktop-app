@@ -1,8 +1,22 @@
 import { NotebookPen, NotebookTabs, UserCog } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router';
 import { ModeToggle } from './mode-toggle';
+import { useEffect } from 'react';
+import { listen } from '@tauri-apps/api/event';
+import { useTimer } from './timer-context';
 
 export default function Layout() {
+  const { calculateTimer } = useTimer();
+
+  useEffect(() => {
+    const unlisten = listen('tauri://focus', async () => {
+      await calculateTimer();
+    });
+    return () => {
+      unlisten.then((fn) => fn());
+    };
+  }, [calculateTimer]);
+
   return (
     <div className="flex h-full">
       <div className="bg-primary-foreground h-full w-16">

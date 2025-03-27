@@ -4,11 +4,11 @@ import { getDate } from '@/utils/get-date';
 import { getTime } from '@/utils/get-time';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { differenceInSeconds } from 'date-fns';
-import { listen } from '@tauri-apps/api/event';
 
 interface TimerContextType {
   time: number;
   isRunning: boolean;
+  calculateTimer: () => Promise<void>;
   startTimer: ({
     marca,
     documento,
@@ -42,45 +42,39 @@ export const TimerProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [refresh, setRefresh] = useState<boolean>(true);
 
-  useEffect(() => {
-    const unlisten = listen('tauri://focus', () => {
-      setRefresh(true);
-    });
-    return () => {
-      unlisten.then((fn) => fn());
-    };
-  }, []);
+  const calculateTimer = async () => {
+    try {
+      const db = await initDB();
+      const [res] = (await db.select('SELECT * FROM daily WHERE horfin is null')) as DailyTask[];
+      if (res) {
+        const now = new Date();
+        const [hours, minutes, seconds] = res.horini.split(':').map(Number);
+        const pastTime = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          hours,
+          minutes,
+          seconds
+        );
+        const diffSeconds = differenceInSeconds(now, pastTime);
+        setTime(diffSeconds > 0 ? diffSeconds : 0);
+        setIsRunning(true);
+        setRefresh(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const db = await initDB();
-        const [res] = (await db.select('SELECT * FROM daily WHERE horfin is null')) as DailyTask[];
-        if (res) {
-          const now = new Date();
-          const [hours, minutes, seconds] = res.horini.split(':').map(Number);
-          const pastTime = new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDate(),
-            hours,
-            minutes,
-            seconds
-          );
-          const diffSeconds = differenceInSeconds(now, pastTime);
-          setTime(diffSeconds > 0 ? diffSeconds : 0);
-          setIsRunning(true);
-          setRefresh(false);
-        }
-      } catch (err) {
-        console.log(err);
-      }
+      await calculateTimer();
     };
-
     if (refresh) {
       fetchData();
     }
-  }, [refresh]);
+  }, [refresh, calculateTimer]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined;
@@ -161,7 +155,7 @@ export const TimerProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   return (
-    <TimerContext.Provider value={{ time, isRunning, startTimer, pauseTimer }}>
+    <TimerContext.Provider value={{ time, isRunning, calculateTimer, startTimer, pauseTimer }}>
       {children}
     </TimerContext.Provider>
   );
