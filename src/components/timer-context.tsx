@@ -2,7 +2,7 @@ import { initDB } from '@/db';
 import { DailyTask } from '@/schemas/daily-task';
 import { getDate } from '@/utils/get-date';
 import { getTime } from '@/utils/get-time';
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { differenceInSeconds } from 'date-fns';
 
 interface TimerContextType {
@@ -40,9 +40,8 @@ export const TimerContext = createContext<TimerContextType | undefined>(undefine
 export const TimerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [time, setTime] = useState<number>(0);
   const [isRunning, setIsRunning] = useState<boolean>(false);
-  const [refresh, setRefresh] = useState<boolean>(true);
 
-  const calculateTimer = async () => {
+  const calculateTimer = useCallback(async () => {
     try {
       const db = await initDB();
       const [res] = (await db.select('SELECT * FROM daily WHERE horfin is null')) as DailyTask[];
@@ -60,21 +59,18 @@ export const TimerProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         const diffSeconds = differenceInSeconds(now, pastTime);
         setTime(diffSeconds > 0 ? diffSeconds : 0);
         setIsRunning(true);
-        setRefresh(false);
       }
     } catch (err) {
       console.log(err);
     }
-  };
+  }, [initDB, setTime, setIsRunning]);
 
   useEffect(() => {
     const fetchData = async () => {
       await calculateTimer();
     };
-    if (refresh) {
-      fetchData();
-    }
-  }, [refresh, calculateTimer]);
+    fetchData();
+  }, [calculateTimer]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined;
