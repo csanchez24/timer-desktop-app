@@ -9,12 +9,13 @@ import {
 } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTask } from '@/hooks/tasks';
-import { ArrowLeft, CircleStop, Play } from 'lucide-react';
+import { ArrowLeft, ArrowRightLeft, CircleStop, Play } from 'lucide-react';
 import { createElement, ReactNode } from 'react';
 import { NavLink, useParams } from 'react-router';
 import { SuspenceForm } from './suspence-form';
 import { TaskForm } from './task-form';
 import { DeclineForm } from './decline-form';
+import { ReassignForm } from './reassign-form';
 
 function InfoBlock({
   label,
@@ -135,6 +136,25 @@ export default function Task() {
                 </SheetContent>
               </Sheet>
             </>
+          )}
+          {(task?.data?.mesa02?.estado === 'ASIGNADO' ||
+            task?.data?.mesa02?.estado === 'EN PROCESO') && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="destructive">
+                  Reasignar <ArrowRightLeft />
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="">
+                <SheetHeader>
+                  <SheetTitle>Reasignar el Caso</SheetTitle>
+                  <SheetDescription>Esta accion Reasignara el Caso a un usuario.</SheetDescription>
+                </SheetHeader>
+                <div className="px-4">
+                  <ReassignForm task={task?.data?.mesa02} />
+                </div>
+              </SheetContent>
+            </Sheet>
           )}
         </div>
       </div>

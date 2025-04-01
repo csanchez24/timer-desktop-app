@@ -142,6 +142,51 @@ export const useDeclineTask = ({
   });
 };
 
+export const useReassignTask = ({
+  onSuccess,
+  onError,
+}: { onSuccess?(): void; onError?(): void } = {}) => {
+  return useMutation({
+    mutationFn: async ({
+      marca,
+      documento,
+      usuario,
+      nota,
+    }: {
+      marca: string;
+      documento: string;
+      usuario: string;
+      nota: string;
+    }) => {
+      const settings = await getSettings();
+      const formData = new FormData();
+      formData.set('marca', marca ?? '');
+      formData.set('documento', documento ?? '');
+      formData.set('usuario', usuario ?? '');
+      formData.set('nota', nota ?? '');
+      const res = await fetch(`${BASEURL}/reasignarCaso`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${settings.token}`,
+        },
+      });
+      if (!res.ok) {
+        throw new Error();
+      }
+      const data = await res.json();
+      return data;
+    },
+    async onSuccess() {
+      onSuccess?.();
+    },
+    onError(e) {
+      toast('mal', { description: e.message });
+      onError?.();
+    },
+  });
+};
+
 export const useAutoTask = ({
   onSuccess,
   onError,

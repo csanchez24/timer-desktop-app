@@ -5,6 +5,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
@@ -28,6 +29,7 @@ import { DeclineForm } from '../task/decline-form';
 import { SuspenceForm } from '../task/suspence-form';
 import { TaskForm } from '../task/task-form';
 import { PresuForm } from '../task/presu-form';
+import { ReassignForm } from '../task/reassign-form';
 
 export default function Tasks() {
   const { data: tasks, isLoading, refetch } = useTasks();
@@ -39,6 +41,7 @@ export default function Tasks() {
   const [openSuspenceTaskDialog, setSuspenceTaskDialog] = useState(false);
   const [openDeclineTaskDialog, setDeclineTaskDialog] = useState(false);
   const [openPresuTaskDialog, setPresuTaskDialog] = useState(false);
+  const [openReassignTaskDialog, setReassignTaskDialog] = useState(false);
 
   const [searchText, setSearchText] = useState<string | undefined>('');
   const onSearch = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -203,9 +206,25 @@ export default function Tasks() {
                           Iniciar
                         </DropdownMenuItem>
                       )}
+                      {(task.estado === 'ASIGNADO' || task.estado === 'EN PROCESO') && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              setMesa02(task);
+                              setReassignTaskDialog(true);
+                            }}
+                            className="text-red-500"
+                          >
+                            Reasignar
+                          </DropdownMenuItem>
+                        </>
+                      )}
 
                       {task.estado === 'ASIGNADO' && (
                         <>
+                          <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onClick={async (e) => {
                               e.stopPropagation();
@@ -322,6 +341,31 @@ export default function Tasks() {
               onSuccess={() => {
                 setMesa02(undefined);
                 setDeclineTaskDialog(false);
+                refetch();
+              }}
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <Sheet
+        open={openReassignTaskDialog}
+        onOpenChange={(open) => {
+          setMesa02(undefined);
+          setReassignTaskDialog(open);
+        }}
+      >
+        <SheetContent className="">
+          <SheetHeader>
+            <SheetTitle>Reasignar el caso</SheetTitle>
+            <SheetDescription>Esta accion reasignara el caso a otra persona.</SheetDescription>
+          </SheetHeader>
+          <div className="p-4">
+            <ReassignForm
+              task={mesa02}
+              onSuccess={() => {
+                setMesa02(undefined);
+                setReassignTaskDialog(false);
                 refetch();
               }}
             />

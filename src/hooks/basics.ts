@@ -1,4 +1,5 @@
 import { BASEURL } from '@/constants';
+import { RespuestaGener02 } from '@/schemas/gener02';
 import { RespuestaMesa01 } from '@/schemas/mesa01';
 import { RespuestaSuspence } from '@/schemas/mesa12';
 import { RespuestaDecline } from '@/schemas/mesa12Decline';
@@ -82,6 +83,26 @@ export const useProjects = () => {
         return null;
       }
       const data = (await res.json()) as RespuestaProjects;
+      return data;
+    },
+  });
+};
+
+export const useUsers = () => {
+  return useQuery({
+    queryKey: ['users'],
+    queryFn: async () => {
+      const settings = await getSettings();
+      const res = await fetch(`${BASEURL}/usuariosSYS`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${settings.token}`,
+        },
+      });
+      if (!res.ok) {
+        return null;
+      }
+      const data = (await res.json()) as RespuestaGener02;
       return data;
     },
   });
