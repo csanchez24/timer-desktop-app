@@ -39,7 +39,9 @@ pub fn run() {
                 usuario TEXT NOT NULL,
                 descripcion TEXT NOT NULL,
                 tiempo_acumulado TEXT NOT NULL,
-                tiempo_estimado TEXT
+                tiempo_estimado TEXT,
+                garantia TEXT NOT NULL,
+                codgar TEXT
             );
         "#,
             kind: MigrationKind::Up,

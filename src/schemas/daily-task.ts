@@ -15,4 +15,6 @@ export type DailyTask = {
   descripcion: string; // CHAR(2), UTF-8 encoded
   tiempo_acumulado: string;
   tiempo_estimado?: string;
+  garantia: string;
+  codgar?: string;
 };

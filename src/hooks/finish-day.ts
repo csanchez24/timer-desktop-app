@@ -33,6 +33,7 @@ export const useFinishDay = ({
       const casos = tasks.map((task) => {
         return { ...task, tieseg: task.tiempo, tiempo: formatTime(parseInt(task.tiempo + '')) };
       });
+      console.log(casos);
       formData.set('casos', JSON.stringify(casos));
       formData.set('fecha', date);
       formData.set('horini', horini);
@@ -58,6 +59,7 @@ export const useFinishDay = ({
       onSuccess?.();
     },
     onError(e) {
+      console.log('error', e);
       toast('mal', { description: e.message });
       onError?.();
     },

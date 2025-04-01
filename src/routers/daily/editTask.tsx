@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { useTimer } from '@/components/timer-context';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -19,6 +18,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { DailyTask } from '@/schemas/daily-task';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
+import { initDB } from '@/db';
 
 const formSchema = z.object({
   nota: z.string().min(2, {
@@ -26,13 +26,11 @@ const formSchema = z.object({
   }),
 });
 
-export function StartForm({ task, onSuccess }: { task?: DailyTask; onSuccess?(): void }) {
-  const { startTimer } = useTimer();
-
+export function EditTask({ task, onSuccess }: { task?: DailyTask; onSuccess?(): void }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      nota: '',
+      nota: task?.nota ?? '',
     },
   });
 
@@ -40,25 +38,16 @@ export function StartForm({ task, onSuccess }: { task?: DailyTask; onSuccess?():
     async function onSubmit(values: z.infer<typeof formSchema>) {
       if (!task) return;
       try {
-        await startTimer({
-          marca: task.marca,
-          documento: task.documento,
-          estado: task.estado,
-          nota: values.nota,
-          area: task.area,
-          usuario: task.usuario,
-          descripcion: task.descripcion,
-          tiempoAcumulado: task.tiempo_acumulado,
-          tiempoEstimado: task.tiempo_estimado,
-          garantia: task.garantia === 'NO' ? 'N' : 'S',
-        });
+        if (!task) return;
+        const db = await initDB();
+        await db.execute('UPDATE daily SET nota = ? WHERE numero = ?', [values.nota, task.numero]);
         onSuccess?.();
         return;
       } catch (e) {
-        toast('Error Iniciando la tarea');
+        toast('Error editando el caso');
       }
     },
-    [task, startTimer, onSuccess]
+    [task, initDB, onSuccess]
   );
 
   return (
@@ -78,7 +67,7 @@ export function StartForm({ task, onSuccess }: { task?: DailyTask; onSuccess?():
             </FormItem>
           )}
         />
-        <Button type="submit">Empezar</Button>
+        <Button type="submit">Modificar</Button>
       </form>
     </Form>
   );

@@ -1,3 +1,10 @@
+type Mesa13 = {
+  fecha: string;
+  hora: string;
+  usuario: string;
+  tiempo: string;
+  nota: string;
+};
 export type Mesa02 = {
   marca: string;
   documento: string;
@@ -27,6 +34,7 @@ export type Mesa02 = {
   tiempo_presupuestado?: string;
   tiempo_acumulado: string;
   tiempo_estimado?: string;
+  mesa13?: Mesa13[];
 };
 
 export type RespuestaTasks = {

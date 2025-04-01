@@ -31,11 +31,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useDailyTask } from '@/hooks/daily';
 import { DailyTask } from '@/schemas/daily-task';
 import { formatTime } from '@/utils/format-time';
-import { BookA, Play } from 'lucide-react';
+import { BookA, Pencil, Play, ShieldQuestion } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { AutoGestionForm } from './auto-gestion-form';
 import { StartForm } from './startForm';
+import { GarantiaForm } from './garantia-form';
+import { EditTask } from './editTask';
 
 export default function Daily() {
   const navigate = useNavigate();
@@ -52,6 +54,28 @@ export default function Daily() {
       setOpenedDialog(open);
     },
     [setTask, setOpenedDialog]
+  );
+
+  const [openedGarantia, setOpenedGarantia] = useState(false);
+  const handleGarantiaChange = useCallback(
+    (open: boolean) => {
+      if (open === false) {
+        setTask(undefined);
+      }
+      setOpenedGarantia(open);
+    },
+    [setTask, setOpenedGarantia]
+  );
+
+  const [openedEdit, setOpenedEdit] = useState(false);
+  const handleEditChange = useCallback(
+    (open: boolean) => {
+      if (open === false) {
+        setTask(undefined);
+      }
+      setOpenedEdit(open);
+    },
+    [setTask, setOpenedEdit]
   );
 
   const [openedAutoDialog, setOpenedAutoDialog] = useState(false);
@@ -72,11 +96,29 @@ export default function Daily() {
     navigate('/finish');
   }, [pauseTimer, navigate]);
 
+  const onEditTask = useCallback(
+    async (task: DailyTask) => {
+      if (!task) return;
+      setTask(task);
+      setOpenedEdit(true);
+    },
+    [setTask, setOpenedEdit]
+  );
+
   const onStartTime = useCallback(
-    async function onStartTime(task: DailyTask) {
+    async (task: DailyTask) => {
       if (!task) return;
       setTask(task);
       setOpenedDialog(true);
+    },
+    [setTask, setOpenedDialog]
+  );
+
+  const onModifyGarantia = useCallback(
+    async (task: DailyTask) => {
+      if (!task) return;
+      setTask(task);
+      setOpenedGarantia(true);
     },
     [setTask, setOpenedDialog]
   );
@@ -144,7 +186,21 @@ export default function Daily() {
         {data
           ?.filter((d) => !d.horfin)
           .map((daily) => (
-            <div className="block rounded-xl border p-4 shadow">
+            <div className="relative block rounded-xl border p-4 shadow">
+              <div className="absolute top-0 right-0">
+                <div className="flex gap-1">
+                  <div>
+                    <Button variant="ghost" onClick={() => onEditTask(daily)}>
+                      <Pencil className="" />
+                    </Button>
+                  </div>
+                  <div>
+                    <Button variant="ghost" onClick={() => onModifyGarantia(daily)}>
+                      <ShieldQuestion className="" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
               <div className="flex items-center justify-between gap-2">
                 <div className="flex-1 text-sm">
                   <p>
@@ -180,7 +236,21 @@ export default function Daily() {
           {data
             ?.filter((d) => d.horfin)
             .map((daily) => (
-              <div className="block rounded-xl border p-4 shadow">
+              <div className="relative block rounded-xl border p-4 shadow">
+                <div className="absolute top-0 right-0">
+                  <div className="flex gap-1">
+                    <div>
+                      <Button variant="ghost" onClick={() => onEditTask(daily)}>
+                        <Pencil className="" />
+                      </Button>
+                    </div>
+                    <div>
+                      <Button variant="ghost" onClick={() => onModifyGarantia(daily)}>
+                        <ShieldQuestion className="" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
                 <div className="flex justify-between gap-2">
                   <div className="flex-1 text-sm">
                     <p>
@@ -218,6 +288,22 @@ export default function Daily() {
             ))}
         </div>
       </div>
+      <Dialog open={openedEdit} onOpenChange={handleEditChange}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Modificar la Nota</DialogTitle>
+            <DialogDescription>esta opcion modificara la nota</DialogDescription>
+          </DialogHeader>
+          <EditTask
+            task={task}
+            onSuccess={() => {
+              setTask(undefined);
+              setOpenedEdit(false);
+              refetch();
+            }}
+          />
+        </DialogContent>
+      </Dialog>
       <Dialog open={openedDialog} onOpenChange={handleDialogChange}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -235,6 +321,24 @@ export default function Daily() {
           />
         </DialogContent>
       </Dialog>
+      <Sheet open={openedGarantia} onOpenChange={handleGarantiaChange}>
+        <SheetContent className="">
+          <SheetHeader>
+            <SheetTitle>Motificar la garantia</SheetTitle>
+            <SheetDescription>Esta accion modifica la garantia del caso</SheetDescription>
+          </SheetHeader>
+          <div className="p-4">
+            <GarantiaForm
+              task={task}
+              onSuccess={() => {
+                setTask(undefined);
+                setOpenedGarantia(false);
+                refetch();
+              }}
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

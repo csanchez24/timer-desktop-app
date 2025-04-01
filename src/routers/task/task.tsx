@@ -16,6 +16,15 @@ import { SuspenceForm } from './suspence-form';
 import { TaskForm } from './task-form';
 import { DeclineForm } from './decline-form';
 import { ReassignForm } from './reassign-form';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 function InfoBlock({
   label,
@@ -168,6 +177,44 @@ export default function Task() {
         {data.map((d) => (
           <InfoBlock key={d.label} {...d} />
         ))}
+      </div>
+      <div>
+        <h2 className="mb-4">
+          Historial de Tiempo y Notas (Tiempo acumulado: {task?.data?.mesa02.tiempo_acumulado} )
+        </h2>
+        <Table className="max-w-full">
+          <TableHeader>
+            <TableRow>
+              <TableHead>Fecha</TableHead>
+              <TableHead>Usuario</TableHead>
+              <TableHead>Tiempo</TableHead>
+              <TableHead>Nota</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {task?.data?.mesa02?.mesa13?.map((d) => (
+              <TableRow>
+                <TableCell>
+                  {d.fecha} {d.hora}
+                </TableCell>
+                <TableCell>{d.usuario}</TableCell>
+                <TableCell>{d.tiempo}</TableCell>
+                <TableCell>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger className="text-left">
+                        {d.nota.substring(0, 40)}...
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-96 text-left">{d.nota}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

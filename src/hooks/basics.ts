@@ -4,6 +4,7 @@ import { RespuestaMesa01 } from '@/schemas/mesa01';
 import { RespuestaSuspence } from '@/schemas/mesa12';
 import { RespuestaDecline } from '@/schemas/mesa12Decline';
 import { RespuestaProjects } from '@/schemas/mesa20';
+import { RespuestaGarantias } from '@/schemas/mesa25';
 import { getSettings } from '@/utils/get-settings';
 import { useQuery } from '@tanstack/react-query';
 import { fetch } from '@tauri-apps/plugin-http';
@@ -103,6 +104,26 @@ export const useUsers = () => {
         return null;
       }
       const data = (await res.json()) as RespuestaGener02;
+      return data;
+    },
+  });
+};
+
+export const useGuarantees = () => {
+  return useQuery({
+    queryKey: ['guarantees'],
+    queryFn: async () => {
+      const settings = await getSettings();
+      const res = await fetch(`${BASEURL}/motivosGarantia`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${settings.token}`,
+        },
+      });
+      if (!res.ok) {
+        return null;
+      }
+      const data = (await res.json()) as RespuestaGarantias;
       return data;
     },
   });
