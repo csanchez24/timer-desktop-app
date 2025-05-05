@@ -52,6 +52,7 @@ export function TaskForm({ task }: { task?: Mesa02 }) {
           tiempoAcumulado: task.tiempo_acumulado,
           tiempoEstimado: task.tiempo_estimado,
           garantia: task.garantia === 'NO' ? 'N' : 'S',
+          codgar: task.codgar,
         });
         navigate('/daily');
         return;

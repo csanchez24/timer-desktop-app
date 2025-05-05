@@ -31,8 +31,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useDailyTask } from '@/hooks/daily';
 import { DailyTask } from '@/schemas/daily-task';
 import { formatTime } from '@/utils/format-time';
-import { BookA, Pencil, Play, ShieldQuestion } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { BookA, Pause, Pencil, Play, ShieldQuestion } from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { AutoGestionForm } from './auto-gestion-form';
 import { StartForm } from './startForm';
@@ -42,7 +42,7 @@ import { EditTask } from './editTask';
 export default function Daily() {
   const navigate = useNavigate();
   const { data, isLoading, refetch } = useDailyTask();
-  const { time, pauseTimer } = useTimer();
+  const { time, pauseTimer, cleanTimer } = useTimer();
 
   const [task, setTask] = useState<DailyTask>();
   const [openedDialog, setOpenedDialog] = useState(false);
@@ -86,10 +86,27 @@ export default function Daily() {
     [setOpenedAutoDialog]
   );
 
+  const timeAcc = useMemo(() => {
+    if (!data) return;
+    const total = data?.reduce((pre, acc) => pre + parseInt(acc.tiempo ?? '0'), 0);
+
+    return formatTime(total + time);
+  }, [data, time]);
+
   const onSuccessAuto = useCallback(() => {
     refetch();
     setOpenedAutoDialog(false);
   }, [refetch, setOpenedAutoDialog]);
+
+  const pauseTask = useCallback(async () => {
+    await pauseTimer();
+    refetch();
+  }, [pauseTimer, refetch]);
+
+  const clean = useCallback(async () => {
+    await cleanTimer();
+    refetch();
+  }, [cleanTimer, refetch]);
 
   const goToFinishPage = useCallback(async () => {
     await pauseTimer();
@@ -125,11 +142,37 @@ export default function Daily() {
 
   return (
     <div className="container">
+      <div className="mb-4 flex items-center justify-end gap-3">
+        <p>Total: {timeAcc}</p>
+        <p>Tiempo: {formatTime(time)}</p>
+      </div>
       <div className="mb-4 flex items-center justify-between">
-        <div>
+        <div className="flex items-center gap-3">
           <h1 className="text-lg">Caso Activo</h1>
         </div>
         <div className="flex gap-3">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive">Borrar Historial</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Esta seguro de borrar el historial de tiempo?</AlertDialogTitle>
+                <AlertDialogDescription>Esta accion borrara los tiempos.</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-red-500 text-white hover:bg-red-500 hover:text-white hover:opacity-80"
+                  onClick={() => {
+                    clean();
+                  }}
+                >
+                  Borrar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <Sheet open={openedAutoDialog} onOpenChange={handleAutoDialogChange}>
             <SheetTrigger asChild>
               <Button>
@@ -225,7 +268,14 @@ export default function Daily() {
                   {daily.tiempo_estimado && <p className="">Estimado: {daily.tiempo_estimado}</p>}
                   <p className="mb-2">Acumulado: {daily.tiempo_acumulado}</p>
                 </div>
-                <div className="text-secondary text-sm font-bold">{formatTime(time)}</div>
+                <div className="text-secondary flex items-center gap-1 text-sm font-bold">
+                  <div>{formatTime(time)}</div>
+                  <div>
+                    <Button variant="ghost" onClick={() => pauseTask()}>
+                      <Pause className="" />
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
           ))}

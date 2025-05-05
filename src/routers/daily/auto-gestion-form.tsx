@@ -69,6 +69,7 @@ export function AutoGestionForm({
           tiempoAcumulado: task?.tiempo_acumulado ?? '',
           tiempoEstimado: task?.tiempo_estimado,
           garantia: task.garantia === 'NO' ? 'N' : 'S',
+          codgar: task.codgar,
         });
         onSuccess?.();
         toast('Se creo caso con exito.');

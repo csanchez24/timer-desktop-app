@@ -50,7 +50,8 @@ export function StartForm({ task, onSuccess }: { task?: DailyTask; onSuccess?():
           descripcion: task.descripcion,
           tiempoAcumulado: task.tiempo_acumulado,
           tiempoEstimado: task.tiempo_estimado,
-          garantia: task.garantia === 'NO' ? 'N' : 'S',
+          garantia: task.garantia == 'S' ? 'S' : 'N',
+          codgar: task.codgar,
         });
         onSuccess?.();
         return;

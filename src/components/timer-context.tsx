@@ -8,6 +8,7 @@ import { differenceInSeconds } from 'date-fns';
 interface TimerContextType {
   time: number;
   isRunning: boolean;
+  cleanTimer: () => Promise<void>;
   calculateTimer: () => Promise<void>;
   startTimer: ({
     marca,
@@ -21,6 +22,7 @@ interface TimerContextType {
     tiempoAcumulado,
     tiempoEstimado,
     garantia,
+    codgar,
   }: {
     marca: string;
     documento: string;
@@ -33,6 +35,7 @@ interface TimerContextType {
     tiempoAcumulado: string;
     tiempoEstimado?: string;
     garantia: 'S' | 'N';
+    codgar: string | null | undefined;
   }) => Promise<void>;
   pauseTimer: () => Promise<void>;
 }
@@ -102,6 +105,7 @@ export const TimerProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     tiempoEstimado,
     tiempoAcumulado,
     garantia = 'N',
+    codgar,
   }: {
     marca: string;
     documento: string;
@@ -114,6 +118,7 @@ export const TimerProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     tiempoAcumulado: string;
     tiempoEstimado?: string;
     garantia: string;
+    codgar: string | null | undefined;
   }) => {
     const db = await initDB();
     const finalTime = getTime();
@@ -123,7 +128,7 @@ export const TimerProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     ]);
     const date = getDate();
     await db.execute(
-      'INSERT into daily (fecha, marca,documento,estado,estnue,horini,nota,tiempo,cerrar,area,usuario,descripcion,tiempo_acumulado,tiempo_estimado,garantia) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,$10,$11,$12,$13,$14,$15)',
+      'INSERT into daily (fecha, marca,documento,estado,estnue,horini,nota,tiempo,cerrar,area,usuario,descripcion,tiempo_acumulado,tiempo_estimado,garantia,codgar) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,$10,$11,$12,$13,$14,$15,$16)',
       [
         date,
         marca,
@@ -140,6 +145,7 @@ export const TimerProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         tiempoAcumulado,
         tiempoEstimado,
         garantia,
+        codgar,
       ]
     );
     setTime(0);
@@ -154,9 +160,17 @@ export const TimerProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     ]);
     setIsRunning(false);
   };
+  const cleanTimer = async () => {
+    const db = await initDB();
+    await db.execute('DELETE FROM daily');
+    setTime(0);
+    setIsRunning(false);
+  };
 
   return (
-    <TimerContext.Provider value={{ time, isRunning, calculateTimer, startTimer, pauseTimer }}>
+    <TimerContext.Provider
+      value={{ time, isRunning, calculateTimer, startTimer, pauseTimer, cleanTimer }}
+    >
       {children}
     </TimerContext.Provider>
   );

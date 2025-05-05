@@ -22,6 +22,7 @@ export type Mesa02 = {
   fecha_estado: string;
   descripcion: string;
   garantia: string;
+  codgar?: string | null;
   motivo_garantia: string;
   url_caso: string | null;
   archivo_adjunto: string | null;
